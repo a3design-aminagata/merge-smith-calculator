@@ -70,12 +70,15 @@ boostToggle.addEventListener("change", updateStageMultiplier);
 
 // --- goal table ----------------------------------------------------------
 
-function addGoalRow(name = "", tiers = "", qty = "", banked = "0", icon = "") {
+const goalStartTierInput = document.getElementById("goal-start-tier");
+
+function addGoalRow(name = "", qty = "", banked = "0", icon = "") {
   const tr = document.createElement("tr");
   const iconHtml = icon ? `<img src="./icons/${icon}" class="row-icon" alt="" />` : "";
   tr.innerHTML = `
+    <td class="drag-cell"><span class="row-drag" title="ドラッグして並び替え">⠿</span></td>
     <td class="name-cell">${iconHtml}<input type="text" class="goal-name" value="${name}" placeholder="例: 剣" /></td>
-    <td><input type="number" class="goal-tiers" min="0" value="${tiers}" placeholder="?" /></td>
+    <td><span class="goal-tier-badge">-</span></td>
     <td><input type="number" class="goal-qty" min="0" value="${qty}" placeholder="?" /></td>
     <td><input type="number" class="goal-banked" min="0" value="${banked}" /></td>
     <td><button class="row-remove" title="削除">✕</button></td>
@@ -83,13 +86,60 @@ function addGoalRow(name = "", tiers = "", qty = "", banked = "0", icon = "") {
   tr.querySelector(".row-remove").addEventListener("click", () => {
     tr.remove();
     refreshInvNameOptions();
+    recomputeGoalTiers();
   });
   tr.querySelector(".goal-name").addEventListener("input", refreshInvNameOptions);
+  enableRowDrag(tr, tr.querySelector(".row-drag"));
   goalBody.appendChild(tr);
   refreshInvNameOptions();
+  recomputeGoalTiers();
 }
 
 document.getElementById("add-goal-row").addEventListener("click", () => addGoalRow());
+
+function recomputeGoalTiers() {
+  const start = Number(goalStartTierInput.value) || 0;
+  [...goalBody.querySelectorAll("tr")].forEach((tr, idx) => {
+    const tier = start + idx;
+    tr.dataset.tier = String(tier);
+    const badge = tr.querySelector(".goal-tier-badge");
+    if (badge) badge.textContent = tier;
+  });
+}
+
+goalStartTierInput.addEventListener("input", recomputeGoalTiers);
+
+// --- drag-to-reorder (mouse + touch) ---------------------------------------
+
+function enableRowDrag(tr, handle) {
+  handle.addEventListener("pointerdown", (e) => {
+    e.preventDefault();
+    tr.classList.add("dragging");
+
+    const onMove = (ev) => {
+      const overRow = [...goalBody.querySelectorAll("tr")]
+        .filter((r) => r !== tr)
+        .find((r) => {
+          const rect = r.getBoundingClientRect();
+          return ev.clientY >= rect.top && ev.clientY <= rect.bottom;
+        });
+      if (!overRow) return;
+      const overRect = overRow.getBoundingClientRect();
+      const isAfter = ev.clientY > overRect.top + overRect.height / 2;
+      if (isAfter) overRow.after(tr); else overRow.before(tr);
+      recomputeGoalTiers();
+    };
+
+    const onUp = () => {
+      tr.classList.remove("dragging");
+      document.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerup", onUp);
+    };
+
+    document.addEventListener("pointermove", onMove);
+    document.addEventListener("pointerup", onUp);
+  });
+}
 
 // --- inventory table -------------------------------------------------------
 
@@ -131,7 +181,7 @@ document.getElementById("add-inv-row").addEventListener("click", () => addInvRow
 document.getElementById("calc-btn").addEventListener("click", () => {
   const goals = [...goalBody.querySelectorAll("tr")].map((tr) => ({
     name: tr.querySelector(".goal-name").value.trim(),
-    tiers: Number(tr.querySelector(".goal-tiers").value) || 0,
+    tiers: Number(tr.dataset.tier) || 0,
     qty: Number(tr.querySelector(".goal-qty").value) || 0,
     banked: Number(tr.querySelector(".goal-banked").value) || 0,
   })).filter((g) => g.name);
@@ -263,8 +313,8 @@ function fileToBase64(file) {
 // --- init --------------------------------------------------------------
 
 renderDigitTable();
-addGoalRow("剣", "", "", "0", "icon-sword.png");
-addGoalRow("弓矢", "", "", "0", "icon-bow.png");
-addGoalRow("鎧", "", "", "0", "icon-armor.png");
-addGoalRow("マント", "", "", "0", "icon-cape.png");
+addGoalRow("剣", "", "0", "icon-sword.png");
+addGoalRow("弓矢", "", "0", "icon-bow.png");
+addGoalRow("鎧", "", "0", "icon-armor.png");
+addGoalRow("マント", "", "0", "icon-cape.png");
 addInvRow();

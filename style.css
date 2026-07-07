@@ -222,6 +222,36 @@ td.name-cell input {
   font-size: 1rem;
 }
 
+td.drag-cell {
+  padding: 6px 0;
+  width: 28px;
+}
+
+.row-drag {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  display: inline-block;
+  padding: 4px 6px;
+}
+
+.row-drag-inline {
+  color: var(--text-dim);
+}
+
+.goal-table tr.dragging {
+  background: rgba(79, 195, 247, 0.12);
+}
+
+.goal-tier-badge {
+  display: inline-block;
+  min-width: 1.6em;
+  color: var(--text);
+  font-weight: 600;
+}
+
 .btn-add {
   background: none;
   border: 1px dashed var(--border);

@@ -48,9 +48,14 @@
 
   <section class="card">
     <h2><img src="./icons/icon-shield.png" class="h2-icon" alt="" /> ② 目標（Final Goalに必要なアイテム）</h2>
-    <p class="note">進行バーに並んでいる完成アイテム（剣・弓・鎧・マントなど）を1行ずつ。「段数」は丸太から何回マージ（2個→1個）を重ねるとそのアイテムになるか。分からなければ盤面を見ながら数えてください。</p>
+    <p class="note">進行バーに並んでいる完成アイテム（剣・弓・鎧・マントなど）を上から順に。「段数」は丸太から何回マージ（2個→1個）を重ねるとそのアイテムになるかで、一番上の行の段数を基準に自動計算されます。並び順があやしければ <span class="row-drag-inline">⠿</span> を掴んでドラッグ（スマホなら指でスワイプ）して入れ替えてください。</p>
+    <div class="row">
+      <label for="goal-start-tier">一番上の項目の段数（起点）</label>
+      <input type="number" id="goal-start-tier" min="0" value="1" />
+      <span class="hint">丸太=0が基準。以降の行は自動で +1, +2... と積み上がります</span>
+    </div>
     <div class="table-wrap"><table class="goal-table" id="goal-table">
-      <thead><tr><th>アイテム名</th><th>段数<br><span class="th-note">(丸太=0)</span></th><th>必要数</th><th>すでに納品済み</th><th></th></tr></thead>
+      <thead><tr><th></th><th>アイテム名</th><th>段数<br><span class="th-note">(自動計算)</span></th><th>必要数</th><th>すでに納品済み</th><th></th></tr></thead>
       <tbody id="goal-body"></tbody>
     </table></div>
     <button class="btn-add" id="add-goal-row">+ 行を追加</button>
