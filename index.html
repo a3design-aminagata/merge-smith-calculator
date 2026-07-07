@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Merge Smith 王冠カウントダウン</title>
+<link rel="stylesheet" href="./style.css" />
+<link rel="stylesheet" href="./reference.css" />
+</head>
+<body>
+<button id="menu-toggle" class="menu-btn" aria-label="メニュー">☰</button>
+<div id="menu-backdrop" class="menu-backdrop"></div>
+<nav id="side-menu" class="side-menu">
+  <button id="menu-close" class="side-menu-close" aria-label="閉じる">✕</button>
+  <h3>メニュー</h3>
+  <a href="./reference.html">📋 アイコン参考資料</a>
+</nav>
+
+<header class="app-header">
+  <h1><img src="./icons/icon-crown.png" class="title-icon" alt="" /> Merge Smith 王冠カウントダウン</h1>
+  <p class="sub">Royal Match「Merge Smith」で、あと何ゲームクリアすれば王冠(Final Goal)が完成しそうかを大まかに見積もる電卓</p>
+</header>
+
+<main class="stack">
+
+  <section class="card">
+    <h2><img src="./icons/icon-log.png" class="h2-icon" alt="" /> ① ステージ設定（丸太の獲得倍率）</h2>
+    <p class="note">クリアするステージ番号の一の位によって、1回のクリアでもらえる丸太（素材）の数が変わる想定。数値は暫定なので、実際と違ったら自由に書き換えてください。</p>
+
+    <div class="row">
+      <label for="stage-number">今のステージ番号（下2桁でOK）</label>
+      <input type="number" id="stage-number" min="0" placeholder="例: 19" />
+      <span class="hint">一の位: <b id="stage-digit">-</b> → 今回の獲得倍率: <b id="stage-multiplier">-</b></span>
+    </div>
+
+    <div class="row">
+      <label for="boost-toggle"><input type="checkbox" id="boost-toggle" /> x2ブースト系アイテムを持っている</label>
+      <span class="hint">ONにすると下の表の値がさらに2倍される（5→10, 9→20 のイメージ）</span>
+    </div>
+
+    <div class="row digit-table-header">
+      <span class="standard-badge">標準倍率</span>
+      <button class="btn-add" id="toggle-edit-digits">🔒 編集する</button>
+    </div>
+    <div class="digit-table-wrap"><table class="digit-table" id="digit-table"></table></div>
+    <p class="note warn">⚠️ 2, 5, 9 の位は確認済み（x3, x5, x10）。0, 1, 4, 6, 7, 8 はまだ未確認（暫定x1）。編集するには上の「編集する」を押してください。</p>
+  </section>
+
+  <section class="card">
+    <h2><img src="./icons/icon-shield.png" class="h2-icon" alt="" /> ② 目標（Final Goalに必要なアイテム）</h2>
+    <p class="note">進行バーに並んでいる完成アイテム（剣・弓・鎧・マントなど）を1行ずつ。「段数」は丸太から何回マージ（2個→1個）を重ねるとそのアイテムになるか。分からなければ盤面を見ながら数えてください。</p>
+    <div class="table-wrap"><table class="goal-table" id="goal-table">
+      <thead><tr><th>アイテム名</th><th>段数<br><span class="th-note">(丸太=0)</span></th><th>必要数</th><th>すでに納品済み</th><th></th></tr></thead>
+      <tbody id="goal-body"></tbody>
+    </table></div>
+    <button class="btn-add" id="add-goal-row">+ 行を追加</button>
+  </section>
+
+  <section class="card">
+    <h2><img src="./icons/icon-helmet.png" class="h2-icon" alt="" /> ③ 今の盤面の在庫</h2>
+    <p class="note">今持っているアイテムを、種類・段数・個数で入力（①と同じ「段数」基準）。①の画像添付機能を使うとここを自動入力できます（試験運用）。</p>
+
+    <details class="ai-fill">
+      <summary>📷 スクショから自動入力する（要 Anthropic API キー・試験機能）</summary>
+      <div class="row">
+        <label for="api-key">APIキー</label>
+        <input type="password" id="api-key" placeholder="sk-ant-..." />
+        <span class="hint">ブラウザのlocalStorageにのみ保存。どこにも送信しません</span>
+      </div>
+      <div class="row">
+        <input type="file" id="board-image" accept="image/*" />
+        <button id="analyze-image" class="btn-add">画像を解析して自動入力</button>
+      </div>
+      <p class="note" id="analyze-status"></p>
+    </details>
+
+    <div class="table-wrap"><table class="inv-table" id="inv-table">
+      <thead><tr><th>アイテム名</th><th>段数</th><th>個数</th><th></th></tr></thead>
+      <tbody id="inv-body"></tbody>
+    </table></div>
+    <button class="btn-add" id="add-inv-row">+ 行を追加</button>
+  </section>
+
+  <section class="card result-card">
+    <h2>④ 見積もり結果</h2>
+    <button class="btn-calc" id="calc-btn">残りゲーム数を計算</button>
+    <div id="result"></div>
+  </section>
+
+</main>
+
+<script src="./menu.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>
