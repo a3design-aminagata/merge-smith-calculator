@@ -4,7 +4,7 @@
     {
       "name": "merge-smith-calculator",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["-y", "http-server"],
+      "runtimeArgs": ["-y", "http-server", "-c-1"],
       "port": 8080,
       "autoPort": true
     }

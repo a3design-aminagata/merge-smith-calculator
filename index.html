@@ -62,8 +62,8 @@
   </section>
 
   <section class="card">
-    <h2><img src="./icons/icon-helmet.png" class="h2-icon" alt="" /> ③ 今の盤面の在庫</h2>
-    <p class="note">今持っているアイテムを、種類・段数・個数で入力（①と同じ「段数」基準）。①の画像添付機能を使うとここを自動入力できます（試験運用）。</p>
+    <h2><img src="./icons/icon-helmet.png" class="h2-icon" alt="" /> ③ 今の盤面</h2>
+    <p class="note">実際のゲーム画面と同じマス目です。マスをタップして、そこに置いてあるアイテムを選んでください。選択肢は①の丸太と②で設定したアイテムがそのまま使われます。</p>
 
     <details class="ai-fill">
       <summary>📷 スクショから自動入力する（要 Anthropic API キー・試験機能）</summary>
@@ -79,11 +79,9 @@
       <p class="note" id="analyze-status"></p>
     </details>
 
-    <div class="table-wrap"><table class="inv-table" id="inv-table">
-      <thead><tr><th>アイテム名</th><th>段数</th><th>個数</th><th></th></tr></thead>
-      <tbody id="inv-body"></tbody>
-    </table></div>
-    <button class="btn-add" id="add-inv-row">+ 行を追加</button>
+    <div class="board-grid" id="board-grid"></div>
+    <p class="note" id="board-summary">現在の盤面: (空)</p>
+    <button class="btn-add" id="board-clear">盤面を全部空にする</button>
   </section>
 
   <section class="card result-card">
@@ -93,6 +91,14 @@
   </section>
 
 </main>
+
+<div id="cell-picker-backdrop" class="cell-picker-backdrop">
+  <div class="cell-picker">
+    <h3>このマスに置くアイテム</h3>
+    <div class="cell-picker-options" id="cell-picker-options"></div>
+    <button class="btn-add" id="cell-picker-cancel">キャンセル</button>
+  </div>
+</div>
 
 <script src="./menu.js"></script>
 <script src="./app.js"></script>

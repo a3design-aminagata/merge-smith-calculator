@@ -9,7 +9,6 @@ const stageMultEl = document.getElementById("stage-multiplier");
 const boostToggle = document.getElementById("boost-toggle");
 
 const goalBody = document.getElementById("goal-body");
-const invBody = document.getElementById("inv-body");
 
 // --- digit multiplier table ---------------------------------------------
 
@@ -84,14 +83,15 @@ function addGoalRow(name = "", qty = "", banked = "0", icon = "") {
     <td><button class="row-remove" title="削除">✕</button></td>
   `;
   tr.querySelector(".row-remove").addEventListener("click", () => {
+    const removedName = tr.querySelector(".goal-name").value.trim();
     tr.remove();
-    refreshInvNameOptions();
+    boardCells = boardCells.map((v) => (v === removedName ? null : v));
     recomputeGoalTiers();
+    renderBoardGrid();
+    updateBoardSummary();
   });
-  tr.querySelector(".goal-name").addEventListener("input", refreshInvNameOptions);
   enableRowDrag(tr, tr.querySelector(".row-drag"));
   goalBody.appendChild(tr);
-  refreshInvNameOptions();
   recomputeGoalTiers();
 }
 
@@ -141,7 +141,7 @@ function enableRowDrag(tr, handle) {
   });
 }
 
-// --- inventory table -------------------------------------------------------
+// --- board grid (tap-to-fill, mirrors the in-game board) --------------------
 
 function currentGoalNames() {
   return [...goalBody.querySelectorAll(".goal-name")]
@@ -149,32 +149,114 @@ function currentGoalNames() {
     .filter((v) => v.length > 0);
 }
 
-function refreshInvNameOptions() {
-  const names = currentGoalNames();
-  invBody.querySelectorAll("select.inv-name").forEach((sel) => {
-    const prev = sel.value;
-    sel.innerHTML =
-      `<option value="">(選択)</option>` +
-      names.map((n) => `<option value="${n}">${n}</option>`).join("");
-    if (names.includes(prev)) sel.value = prev;
+const BOARD_ROWS = 6;
+const BOARD_COLS = 6;
+let boardCells = new Array(BOARD_ROWS * BOARD_COLS).fill(null);
+
+const boardGridEl = document.getElementById("board-grid");
+const boardSummaryEl = document.getElementById("board-summary");
+const cellPickerBackdrop = document.getElementById("cell-picker-backdrop");
+const cellPickerOptions = document.getElementById("cell-picker-options");
+
+function getBoardItemOptions() {
+  const options = [{ name: "丸太", tier: 0, icon: "icon-log.png" }];
+  [...goalBody.querySelectorAll("tr")].forEach((tr) => {
+    const name = tr.querySelector(".goal-name").value.trim();
+    if (!name) return;
+    const iconImg = tr.querySelector(".name-cell img.row-icon");
+    options.push({
+      name,
+      tier: Number(tr.dataset.tier) || 0,
+      icon: iconImg ? iconImg.getAttribute("src").split("/").pop() : "",
+    });
+  });
+  return options;
+}
+
+function tierForName(name) {
+  if (name === "丸太") return 0;
+  const tr = [...goalBody.querySelectorAll("tr")].find(
+    (t) => t.querySelector(".goal-name").value.trim() === name
+  );
+  return tr ? Number(tr.dataset.tier) || 0 : 0;
+}
+
+function renderBoardGrid() {
+  const options = getBoardItemOptions();
+  boardGridEl.style.gridTemplateColumns = `repeat(${BOARD_COLS}, 1fr)`;
+  boardGridEl.innerHTML = "";
+  boardCells.forEach((name, idx) => {
+    const cell = document.createElement("button");
+    cell.type = "button";
+    cell.className = "board-cell" + (name ? " filled" : "");
+    if (name) {
+      const opt = options.find((o) => o.name === name);
+      cell.innerHTML = opt && opt.icon
+        ? `<img src="./icons/${opt.icon}" alt="${name}" title="${name}" />`
+        : `<span class="cell-label">${name}</span>`;
+    }
+    cell.addEventListener("click", () => openCellPicker(idx));
+    boardGridEl.appendChild(cell);
   });
 }
 
-function addInvRow(name = "", tier = "", count = "") {
-  const tr = document.createElement("tr");
-  tr.innerHTML = `
-    <td class="name-cell"><select class="inv-name"></select></td>
-    <td><input type="number" class="inv-tier" min="0" value="${tier}" /></td>
-    <td><input type="number" class="inv-count" min="0" value="${count}" /></td>
-    <td><button class="row-remove" title="削除">✕</button></td>
-  `;
-  tr.querySelector(".row-remove").addEventListener("click", () => tr.remove());
-  invBody.appendChild(tr);
-  refreshInvNameOptions();
-  if (name) tr.querySelector(".inv-name").value = name;
+function updateBoardSummary() {
+  const counts = {};
+  boardCells.forEach((name) => {
+    if (!name) return;
+    counts[name] = (counts[name] || 0) + 1;
+  });
+  const parts = Object.entries(counts).map(([n, c]) => `${n}×${c}`);
+  boardSummaryEl.textContent = parts.length ? `現在の盤面: ${parts.join(" / ")}` : "現在の盤面: (空)";
 }
 
-document.getElementById("add-inv-row").addEventListener("click", () => addInvRow());
+function openCellPicker(idx) {
+  cellPickerOptions.innerHTML = "";
+
+  const clearBtn = document.createElement("button");
+  clearBtn.type = "button";
+  clearBtn.className = "cell-picker-option clear";
+  clearBtn.textContent = "空にする";
+  clearBtn.addEventListener("click", () => {
+    boardCells[idx] = null;
+    renderBoardGrid();
+    updateBoardSummary();
+    closeCellPicker();
+  });
+  cellPickerOptions.appendChild(clearBtn);
+
+  getBoardItemOptions().forEach((opt) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "cell-picker-option";
+    btn.innerHTML =
+      (opt.icon ? `<img src="./icons/${opt.icon}" alt="" />` : "") + `<span>${opt.name}</span>`;
+    btn.addEventListener("click", () => {
+      boardCells[idx] = opt.name;
+      renderBoardGrid();
+      updateBoardSummary();
+      closeCellPicker();
+    });
+    cellPickerOptions.appendChild(btn);
+  });
+
+  cellPickerBackdrop.classList.add("open");
+}
+
+function closeCellPicker() {
+  cellPickerBackdrop.classList.remove("open");
+}
+
+document.getElementById("cell-picker-cancel").addEventListener("click", closeCellPicker);
+cellPickerBackdrop.addEventListener("click", (e) => {
+  if (e.target === cellPickerBackdrop) closeCellPicker();
+});
+
+document.getElementById("board-clear").addEventListener("click", () => {
+  boardCells = new Array(BOARD_ROWS * BOARD_COLS).fill(null);
+  renderBoardGrid();
+  updateBoardSummary();
+});
 
 // --- calculation -----------------------------------------------------------
 
@@ -187,12 +269,9 @@ document.getElementById("calc-btn").addEventListener("click", () => {
   })).filter((g) => g.name);
 
   const invByName = {};
-  [...invBody.querySelectorAll("tr")].forEach((tr) => {
-    const name = tr.querySelector(".inv-name").value;
-    const tier = Number(tr.querySelector(".inv-tier").value) || 0;
-    const count = Number(tr.querySelector(".inv-count").value) || 0;
+  boardCells.forEach((name) => {
     if (!name) return;
-    invByName[name] = (invByName[name] || 0) + count * Math.pow(2, tier);
+    invByName[name] = (invByName[name] || 0) + Math.pow(2, tierForName(name));
   });
 
   const n = stageInput.value.trim();
@@ -291,11 +370,22 @@ document.getElementById("analyze-image").addEventListener("click", async () => {
     (parsed.goalItemNames || []).forEach((name) => {
       if (!currentGoalNames().includes(name)) addGoalRow(name);
     });
-    (parsed.inventory || []).forEach((item) => {
-      addInvRow(item.name, item.tier ?? 0, item.count ?? 1);
-    });
 
-    status.textContent = `解析完了。目標${(parsed.goalItemNames || []).length}件・在庫${(parsed.inventory || []).length}件を追加しました。内容を確認・修正してください。`;
+    let placed = 0;
+    let skipped = 0;
+    (parsed.inventory || []).forEach((item) => {
+      const count = item.count ?? 1;
+      for (let i = 0; i < count; i++) {
+        const emptyIdx = boardCells.findIndex((v) => v === null);
+        if (emptyIdx === -1) { skipped++; continue; }
+        boardCells[emptyIdx] = item.name;
+        placed++;
+      }
+    });
+    renderBoardGrid();
+    updateBoardSummary();
+
+    status.textContent = `解析完了。目標${(parsed.goalItemNames || []).length}件を追加し、盤面に${placed}個を配置しました。${skipped ? `（盤面が満杯のため${skipped}個は未配置）` : ""}内容を確認・修正してください。`;
   } catch (err) {
     status.textContent = "解析に失敗しました: " + err.message;
   }
@@ -317,4 +407,5 @@ addGoalRow("剣", "", "0", "icon-sword.png");
 addGoalRow("弓矢", "", "0", "icon-bow.png");
 addGoalRow("鎧", "", "0", "icon-armor.png");
 addGoalRow("マント", "", "0", "icon-cape.png");
-addInvRow();
+renderBoardGrid();
+updateBoardSummary();
