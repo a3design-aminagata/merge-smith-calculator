@@ -116,30 +116,45 @@ goalStartTierInput.addEventListener("input", recomputeGoalTiers);
 
 const progressBarEl = document.getElementById("progress-bar");
 
+function requiredFor(qtyInput) {
+  const q = Number(qtyInput.value) || 0;
+  return q > 0 ? q : 1;
+}
+
 function renderProgressBar() {
   progressBarEl.innerHTML = "";
-  [...goalBody.querySelectorAll("tr")].forEach((tr) => {
-    const name = tr.querySelector(".goal-name").value.trim();
-    if (!name) return;
-    const iconImg = tr.querySelector(".name-cell img.row-icon");
-    const qtyInput = tr.querySelector(".goal-qty");
+  const rows = [...goalBody.querySelectorAll("tr")].filter((tr) =>
+    tr.querySelector(".goal-name").value.trim()
+  );
+
+  // 先頭から連続して「完了」しているところまでを現在地とみなす
+  let doneCount = 0;
+  for (const tr of rows) {
     const bankedInput = tr.querySelector(".goal-banked");
-    const qty = Number(qtyInput.value) || 0;
     const banked = Number(bankedInput.value) || 0;
+    if (banked >= requiredFor(tr.querySelector(".goal-qty"))) doneCount++;
+    else break;
+  }
+
+  rows.forEach((tr, idx) => {
+    const name = tr.querySelector(".goal-name").value.trim();
+    const iconImg = tr.querySelector(".name-cell img.row-icon");
+    const isDone = idx < doneCount;
 
     const btn = document.createElement("button");
     btn.type = "button";
-    btn.className = "progress-item";
-    btn.title = `${name}: タップで納品済み+1`;
-    btn.innerHTML =
-      (iconImg
-        ? `<img src="${iconImg.getAttribute("src")}" alt="${name}" />`
-        : `<span class="cell-label">${name}</span>`) +
-      `<span class="progress-badge">${banked}${qty ? "/" + qty : ""}</span>`;
+    btn.className = "progress-item" + (isDone ? " done" : "");
+    btn.title = `${name}: タップで「ここまで完了」にする`;
+    btn.innerHTML = iconImg
+      ? `<img src="${iconImg.getAttribute("src")}" alt="${name}" />`
+      : `<span class="cell-label">${name}</span>`;
     btn.addEventListener("click", () => {
-      const q = Number(qtyInput.value) || 0;
-      const cur = Number(bankedInput.value) || 0;
-      bankedInput.value = q > 0 ? Math.min(q, cur + 1) : cur + 1;
+      const alreadyCurrent = idx === doneCount - 1;
+      rows.forEach((r, i) => {
+        const bankedInput = r.querySelector(".goal-banked");
+        const shouldBeDone = alreadyCurrent ? i < idx : i <= idx;
+        bankedInput.value = shouldBeDone ? requiredFor(r.querySelector(".goal-qty")) : 0;
+      });
       renderProgressBar();
     });
     progressBarEl.appendChild(btn);
