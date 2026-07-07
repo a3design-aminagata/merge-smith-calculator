@@ -90,6 +90,8 @@ function addGoalRow(name = "", qty = "", banked = "0", icon = "") {
     renderBoardGrid();
     updateBoardSummary();
   });
+  tr.querySelector(".goal-qty").addEventListener("input", renderProgressBar);
+  tr.querySelector(".goal-banked").addEventListener("input", renderProgressBar);
   enableRowDrag(tr, tr.querySelector(".row-drag"));
   goalBody.appendChild(tr);
   recomputeGoalTiers();
@@ -105,9 +107,44 @@ function recomputeGoalTiers() {
     const badge = tr.querySelector(".goal-tier-badge");
     if (badge) badge.textContent = tier;
   });
+  renderProgressBar();
 }
 
 goalStartTierInput.addEventListener("input", recomputeGoalTiers);
+
+// --- progress bar (mirrors the in-game Final Goal bar) ----------------------
+
+const progressBarEl = document.getElementById("progress-bar");
+
+function renderProgressBar() {
+  progressBarEl.innerHTML = "";
+  [...goalBody.querySelectorAll("tr")].forEach((tr) => {
+    const name = tr.querySelector(".goal-name").value.trim();
+    if (!name) return;
+    const iconImg = tr.querySelector(".name-cell img.row-icon");
+    const qtyInput = tr.querySelector(".goal-qty");
+    const bankedInput = tr.querySelector(".goal-banked");
+    const qty = Number(qtyInput.value) || 0;
+    const banked = Number(bankedInput.value) || 0;
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "progress-item";
+    btn.title = `${name}: タップで納品済み+1`;
+    btn.innerHTML =
+      (iconImg
+        ? `<img src="${iconImg.getAttribute("src")}" alt="${name}" />`
+        : `<span class="cell-label">${name}</span>`) +
+      `<span class="progress-badge">${banked}${qty ? "/" + qty : ""}</span>`;
+    btn.addEventListener("click", () => {
+      const q = Number(qtyInput.value) || 0;
+      const cur = Number(bankedInput.value) || 0;
+      bankedInput.value = q > 0 ? Math.min(q, cur + 1) : cur + 1;
+      renderProgressBar();
+    });
+    progressBarEl.appendChild(btn);
+  });
+}
 
 // --- drag-to-reorder (mouse + touch) ---------------------------------------
 
@@ -403,6 +440,12 @@ function fileToBase64(file) {
 // --- init --------------------------------------------------------------
 
 renderDigitTable();
+addGoalRow("板", "", "0", "icon-plank.png");
+addGoalRow("丸盾", "", "0", "icon-woodshield.png");
+addGoalRow("宝石の盾", "", "0", "icon-gemshield.png");
+addGoalRow("剣（1本）", "", "0", "icon-sword-single.png");
+addGoalRow("兜", "", "0", "icon-helmet.png");
+addGoalRow("紋章の盾", "", "0", "icon-shield.png");
 addGoalRow("剣", "", "0", "icon-sword.png");
 addGoalRow("弓矢", "", "0", "icon-bow.png");
 addGoalRow("鎧", "", "0", "icon-armor.png");

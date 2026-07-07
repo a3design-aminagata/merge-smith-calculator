@@ -24,7 +24,39 @@
 <main class="stack">
 
   <section class="card">
-    <h2><img src="./icons/icon-log.png" class="h2-icon" alt="" /> ① ステージ設定（丸太の獲得倍率）</h2>
+    <h2><img src="./icons/icon-helmet.png" class="h2-icon" alt="" /> ① 今の盤面</h2>
+    <p class="note">実際のゲーム画面と同じマス目です。マスをタップして、そこに置いてあるアイテムを選んでください。選択肢は②の丸太と③で設定したアイテムがそのまま使われます。</p>
+
+    <div class="progress-bar-row">
+      <div class="progress-bar" id="progress-bar"></div>
+      <div class="progress-final" title="Final Goal">
+        <img src="./icons/icon-crown.png" alt="Final Goal" />
+        <span>Final<br>Goal!</span>
+      </div>
+    </div>
+    <p class="note">↑ 実際の進行バーと同じ並びです。アイテムをタップすると「すでに納品済み」を+1できます（③の数字を直接編集してもOK）。</p>
+
+    <details class="ai-fill">
+      <summary>📷 スクショから自動入力する（要 Anthropic API キー・試験機能）</summary>
+      <div class="row">
+        <label for="api-key">APIキー</label>
+        <input type="password" id="api-key" placeholder="sk-ant-..." />
+        <span class="hint">ブラウザのlocalStorageにのみ保存。どこにも送信しません</span>
+      </div>
+      <div class="row">
+        <input type="file" id="board-image" accept="image/*" />
+        <button id="analyze-image" class="btn-add">画像を解析して自動入力</button>
+      </div>
+      <p class="note" id="analyze-status"></p>
+    </details>
+
+    <div class="board-grid" id="board-grid"></div>
+    <p class="note" id="board-summary">現在の盤面: (空)</p>
+    <button class="btn-add" id="board-clear">盤面を全部空にする</button>
+  </section>
+
+  <section class="card">
+    <h2><img src="./icons/icon-log.png" class="h2-icon" alt="" /> ② ステージ設定（丸太の獲得倍率）</h2>
     <p class="note">クリアするステージ番号の一の位によって、1回のクリアでもらえる丸太（素材）の数が変わる想定。数値は暫定なので、実際と違ったら自由に書き換えてください。</p>
 
     <div class="row">
@@ -47,8 +79,8 @@
   </section>
 
   <section class="card">
-    <h2><img src="./icons/icon-shield.png" class="h2-icon" alt="" /> ② 目標（Final Goalに必要なアイテム）</h2>
-    <p class="note">進行バーに並んでいる完成アイテム（剣・弓・鎧・マントなど）を上から順に。「段数」は丸太から何回マージ（2個→1個）を重ねるとそのアイテムになるかで、一番上の行の段数を基準に自動計算されます。並び順があやしければ <span class="row-drag-inline">⠿</span> を掴んでドラッグ（スマホなら指でスワイプ）して入れ替えてください。</p>
+    <h2><img src="./icons/icon-shield.png" class="h2-icon" alt="" /> ③ 目標（Final Goalに必要なアイテム）</h2>
+    <p class="note">丸太から完成アイテムまでの合成チェーンに出てくるアイテムを、丸太に近い順（低段）から上に。途中素材（板・盾・兜など）も含めて全部並べてOKです（王冠=Final Goal自体は含めません）。「段数」は丸太から何回マージ（2個→1個）を重ねるとそのアイテムになるかで、一番上の行の段数を基準に自動計算されます。並び順があやしければ <span class="row-drag-inline">⠿</span> を掴んでドラッグ（スマホなら指でスワイプ）して入れ替えてください。</p>
     <div class="row">
       <label for="goal-start-tier">一番上の項目の段数（起点）</label>
       <input type="number" id="goal-start-tier" min="0" value="1" />
@@ -59,29 +91,6 @@
       <tbody id="goal-body"></tbody>
     </table></div>
     <button class="btn-add" id="add-goal-row">+ 行を追加</button>
-  </section>
-
-  <section class="card">
-    <h2><img src="./icons/icon-helmet.png" class="h2-icon" alt="" /> ③ 今の盤面</h2>
-    <p class="note">実際のゲーム画面と同じマス目です。マスをタップして、そこに置いてあるアイテムを選んでください。選択肢は①の丸太と②で設定したアイテムがそのまま使われます。</p>
-
-    <details class="ai-fill">
-      <summary>📷 スクショから自動入力する（要 Anthropic API キー・試験機能）</summary>
-      <div class="row">
-        <label for="api-key">APIキー</label>
-        <input type="password" id="api-key" placeholder="sk-ant-..." />
-        <span class="hint">ブラウザのlocalStorageにのみ保存。どこにも送信しません</span>
-      </div>
-      <div class="row">
-        <input type="file" id="board-image" accept="image/*" />
-        <button id="analyze-image" class="btn-add">画像を解析して自動入力</button>
-      </div>
-      <p class="note" id="analyze-status"></p>
-    </details>
-
-    <div class="board-grid" id="board-grid"></div>
-    <p class="note" id="board-summary">現在の盤面: (空)</p>
-    <button class="btn-add" id="board-clear">盤面を全部空にする</button>
   </section>
 
   <section class="card result-card">
