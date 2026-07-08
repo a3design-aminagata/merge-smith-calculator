@@ -118,6 +118,7 @@ goalStartTierInput.addEventListener("input", () => { recomputeGoalTiers(); saveS
 
 const progressBarEl = document.getElementById("progress-bar");
 const progressBarFillEl = document.getElementById("progress-bar-fill");
+let progressBarFillSpeedUpTimer = null;
 
 function requiredFor(qtyInput) {
   const q = Number(qtyInput.value) || 0;
@@ -168,20 +169,19 @@ function renderProgressBar() {
 }
 
 function updateProgressBarFill(doneCount) {
-  const prevDoneCount = Number(progressBarFillEl.dataset.doneCount || 0);
-  progressBarFillEl.dataset.doneCount = doneCount;
-
-  // 最初の1本目が完了する瞬間だけ、3倍ゆっくり・ease-out（速い→遅い）で伸ばす
-  const isFirstFill = prevDoneCount === 0 && doneCount === 1;
-  progressBarFillEl.style.transition = isFirstFill ? "width 10s cubic-bezier(0.61, 1, 0.88, 1)" : "";
-
-  if (doneCount <= 0) {
-    progressBarFillEl.style.width = "0px";
-    return;
-  }
   const items = [...progressBarEl.querySelectorAll(".progress-item")];
-  const lastDone = items[doneCount - 1];
-  progressBarFillEl.style.width = lastDone ? `${lastDone.offsetLeft + lastDone.offsetWidth}px` : "0px";
+  const lastDone = doneCount > 0 ? items[doneCount - 1] : null;
+  const targetWidth = lastDone ? `${lastDone.offsetLeft + lastDone.offsetWidth}px` : "0px";
+
+  // 最初はCSSの通り(10s)でじわっと伸ばし、3秒経ったら残りを1秒で書き終える
+  clearTimeout(progressBarFillSpeedUpTimer);
+  progressBarFillEl.style.transition = "";
+  progressBarFillEl.style.width = targetWidth;
+
+  progressBarFillSpeedUpTimer = setTimeout(() => {
+    progressBarFillEl.style.transition = "width 1s ease";
+    progressBarFillEl.style.width = targetWidth;
+  }, 3000);
 }
 
 // --- drag-to-reorder (mouse + touch) ---------------------------------------
