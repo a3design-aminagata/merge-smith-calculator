@@ -27,7 +27,7 @@ function renderDigitTable() {
     inp.dataset.digit = String(d);
     inp.value = DIGIT_DEFAULTS[d];
     inp.disabled = true;
-    inp.addEventListener("input", updateStageMultiplier);
+    inp.addEventListener("input", () => { updateStageMultiplier(); saveState(); });
     td.appendChild(inp);
     valRow.appendChild(td);
   }
@@ -64,8 +64,8 @@ function updateStageMultiplier() {
   stageMultEl.textContent = `丸太 x${mult}`;
 }
 
-stageInput.addEventListener("input", updateStageMultiplier);
-boostToggle.addEventListener("change", updateStageMultiplier);
+stageInput.addEventListener("input", () => { updateStageMultiplier(); saveState(); });
+boostToggle.addEventListener("change", () => { updateStageMultiplier(); saveState(); });
 
 // --- goal table ----------------------------------------------------------
 
@@ -89,15 +89,17 @@ function addGoalRow(name = "", qty = "", banked = "0", icon = "") {
     recomputeGoalTiers();
     renderBoardGrid();
     updateBoardSummary();
+    saveState();
   });
-  tr.querySelector(".goal-qty").addEventListener("input", renderProgressBar);
-  tr.querySelector(".goal-banked").addEventListener("input", renderProgressBar);
+  tr.querySelector(".goal-qty").addEventListener("input", () => { renderProgressBar(); saveState(); });
+  tr.querySelector(".goal-banked").addEventListener("input", () => { renderProgressBar(); saveState(); });
+  tr.querySelector(".goal-name").addEventListener("input", saveState);
   enableRowDrag(tr, tr.querySelector(".row-drag"));
   goalBody.appendChild(tr);
   recomputeGoalTiers();
 }
 
-document.getElementById("add-goal-row").addEventListener("click", () => addGoalRow());
+document.getElementById("add-goal-row").addEventListener("click", () => { addGoalRow(); saveState(); });
 
 function recomputeGoalTiers() {
   const start = Number(goalStartTierInput.value) || 0;
@@ -110,11 +112,12 @@ function recomputeGoalTiers() {
   renderProgressBar();
 }
 
-goalStartTierInput.addEventListener("input", recomputeGoalTiers);
+goalStartTierInput.addEventListener("input", () => { recomputeGoalTiers(); saveState(); });
 
 // --- progress bar (mirrors the in-game Final Goal bar) ----------------------
 
 const progressBarEl = document.getElementById("progress-bar");
+const progressBarFillEl = document.getElementById("progress-bar-fill");
 
 function requiredFor(qtyInput) {
   const q = Number(qtyInput.value) || 0;
@@ -122,7 +125,7 @@ function requiredFor(qtyInput) {
 }
 
 function renderProgressBar() {
-  progressBarEl.innerHTML = "";
+  progressBarEl.querySelectorAll(".progress-item").forEach((el) => el.remove());
   const rows = [...goalBody.querySelectorAll("tr")].filter((tr) =>
     tr.querySelector(".goal-name").value.trim()
   );
@@ -156,9 +159,22 @@ function renderProgressBar() {
         bankedInput.value = shouldBeDone ? requiredFor(r.querySelector(".goal-qty")) : 0;
       });
       renderProgressBar();
+      saveState();
     });
     progressBarEl.appendChild(btn);
   });
+
+  updateProgressBarFill(doneCount);
+}
+
+function updateProgressBarFill(doneCount) {
+  if (doneCount <= 0) {
+    progressBarFillEl.style.width = "0px";
+    return;
+  }
+  const items = [...progressBarEl.querySelectorAll(".progress-item")];
+  const lastDone = items[doneCount - 1];
+  progressBarFillEl.style.width = lastDone ? `${lastDone.offsetLeft + lastDone.offsetWidth}px` : "0px";
 }
 
 // --- drag-to-reorder (mouse + touch) ---------------------------------------
@@ -186,6 +202,7 @@ function enableRowDrag(tr, handle) {
       tr.classList.remove("dragging");
       document.removeEventListener("pointermove", onMove);
       document.removeEventListener("pointerup", onUp);
+      saveState();
     };
 
     document.addEventListener("pointermove", onMove);
@@ -274,6 +291,7 @@ function openCellPicker(idx) {
     renderBoardGrid();
     updateBoardSummary();
     closeCellPicker();
+    saveState();
   });
   cellPickerOptions.appendChild(clearBtn);
 
@@ -288,6 +306,7 @@ function openCellPicker(idx) {
       renderBoardGrid();
       updateBoardSummary();
       closeCellPicker();
+      saveState();
     });
     cellPickerOptions.appendChild(btn);
   });
@@ -308,6 +327,7 @@ document.getElementById("board-clear").addEventListener("click", () => {
   boardCells = new Array(BOARD_ROWS * BOARD_COLS).fill(null);
   renderBoardGrid();
   updateBoardSummary();
+  saveState();
 });
 
 // --- calculation -----------------------------------------------------------
@@ -455,6 +475,7 @@ document.getElementById("analyze-image").addEventListener("click", async () => {
     }
 
     status.textContent = `解析完了。目標${goalItemNames.length}件を追加し、盤面に${placed}個を配置しました。${skipped ? `（盤面が満杯のため${skipped}個は未配置）` : ""}${progressMsg}内容を確認・修正してください。`;
+    saveState();
   } catch (err) {
     status.textContent = "解析に失敗しました: " + err.message;
   }
@@ -469,18 +490,78 @@ function fileToBase64(file) {
   });
 }
 
+// --- persistence (remembers your inputs across reloads) ---------------------
+
+const STATE_STORAGE_KEY = "mergeSmithState";
+
+function saveState() {
+  const state = {
+    stageNumber: stageInput.value,
+    boost: boostToggle.checked,
+    digits: Object.fromEntries(
+      [...digitTable.querySelectorAll("input[data-digit]")].map((inp) => [inp.dataset.digit, inp.value])
+    ),
+    goalStartTier: goalStartTierInput.value,
+    goalRows: [...goalBody.querySelectorAll("tr")].map((tr) => {
+      const iconImg = tr.querySelector(".name-cell img.row-icon");
+      return {
+        name: tr.querySelector(".goal-name").value,
+        qty: tr.querySelector(".goal-qty").value,
+        banked: tr.querySelector(".goal-banked").value,
+        icon: iconImg ? iconImg.getAttribute("src").split("/").pop() : "",
+      };
+    }),
+    boardCells,
+  };
+  localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(state));
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STATE_STORAGE_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 // --- init --------------------------------------------------------------
 
+const DEFAULT_GOAL_ROWS = [
+  { name: "板", qty: "", banked: "1", icon: "icon-plank.png" },
+  { name: "丸盾", qty: "", banked: "1", icon: "icon-woodshield.png" },
+  { name: "宝石の盾", qty: "", banked: "1", icon: "icon-gemshield.png" },
+  { name: "紋章の盾", qty: "", banked: "1", icon: "icon-shield.png" },
+  { name: "兜", qty: "", banked: "1", icon: "icon-helmet.png" },
+  { name: "剣（1本）", qty: "", banked: "1", icon: "icon-sword-single.png" },
+  { name: "剣", qty: "", banked: "0", icon: "icon-sword.png" },
+  { name: "弓矢", qty: "", banked: "0", icon: "icon-bow.png" },
+  { name: "鎧", qty: "", banked: "0", icon: "icon-armor.png" },
+  { name: "マント", qty: "", banked: "0", icon: "icon-cape.png" },
+];
+
 renderDigitTable();
-addGoalRow("板", "", "0", "icon-plank.png");
-addGoalRow("丸盾", "", "0", "icon-woodshield.png");
-addGoalRow("宝石の盾", "", "0", "icon-gemshield.png");
-addGoalRow("紋章の盾", "", "0", "icon-shield.png");
-addGoalRow("兜", "", "0", "icon-helmet.png");
-addGoalRow("剣（1本）", "", "0", "icon-sword-single.png");
-addGoalRow("剣", "", "0", "icon-sword.png");
-addGoalRow("弓矢", "", "0", "icon-bow.png");
-addGoalRow("鎧", "", "0", "icon-armor.png");
-addGoalRow("マント", "", "0", "icon-cape.png");
+
+const savedState = loadState();
+if (savedState) {
+  stageInput.value = savedState.stageNumber || "";
+  boostToggle.checked = !!savedState.boost;
+  if (savedState.digits) {
+    Object.entries(savedState.digits).forEach(([d, v]) => {
+      const inp = digitTable.querySelector(`input[data-digit="${d}"]`);
+      if (inp) inp.value = v;
+    });
+  }
+  goalStartTierInput.value = savedState.goalStartTier ?? "1";
+  const rows = savedState.goalRows && savedState.goalRows.length ? savedState.goalRows : DEFAULT_GOAL_ROWS;
+  rows.forEach((r) => addGoalRow(r.name, r.qty, r.banked, r.icon));
+  if (Array.isArray(savedState.boardCells) && savedState.boardCells.length === BOARD_ROWS * BOARD_COLS) {
+    boardCells = savedState.boardCells;
+  }
+} else {
+  DEFAULT_GOAL_ROWS.forEach((r) => addGoalRow(r.name, r.qty, r.banked, r.icon));
+}
+
+updateStageMultiplier();
 renderBoardGrid();
 updateBoardSummary();

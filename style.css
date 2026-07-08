@@ -267,7 +267,9 @@ td.drag-cell {
 
 .progress-bar {
   flex: 1;
+  position: relative;
   display: flex;
+  align-items: center;
   gap: 4px;
   overflow-x: auto;
   scrollbar-width: none;
@@ -275,6 +277,19 @@ td.drag-cell {
 
 .progress-bar::-webkit-scrollbar {
   display: none;
+}
+
+.progress-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  height: 10px;
+  width: 0;
+  transform: translateY(-50%);
+  background: linear-gradient(180deg, #8fdc7e, #4a9440);
+  border-radius: 999px;
+  transition: width 0.25s ease;
+  z-index: 0;
 }
 
 .progress-item {
@@ -286,6 +301,7 @@ td.drag-cell {
   border-radius: 10px;
   cursor: pointer;
   position: relative;
+  z-index: 1;
   padding: 4px;
   display: flex;
   align-items: center;
@@ -306,11 +322,6 @@ td.drag-cell {
   font-size: 0.55rem;
   color: #4a3a26;
   text-align: center;
-}
-
-.progress-item.done {
-  background: #7bc96f;
-  border-color: #4a9440;
 }
 
 .progress-item.done::after {
