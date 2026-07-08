@@ -385,28 +385,23 @@ document.getElementById("analyze-image").addEventListener("click", async () => {
 以下のJSON形式のみで出力してください（説明文不要）:
 {"inventory":[{"name":"日本語の短い名前","tier":0,"count":1}],"goalItemNames":["名前1","名前2"]}`;
 
-    const res = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-5",
-        max_tokens: 1500,
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "image", source: { type: "base64", media_type: file.type || "image/png", data: base64 } },
-              { type: "text", text: schemaPrompt },
-            ],
-          },
-        ],
-      }),
-    });
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
+      {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: schemaPrompt },
+                { inline_data: { mime_type: file.type || "image/png", data: base64 } },
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
     if (!res.ok) {
       const errText = await res.text();
@@ -414,7 +409,7 @@ document.getElementById("analyze-image").addEventListener("click", async () => {
     }
 
     const data = await res.json();
-    const text = data.content?.map((c) => c.text).join("") || "";
+    const text = data.candidates?.[0]?.content?.parts?.map((p) => p.text || "").join("") || "";
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) throw new Error("JSONが見つかりませんでした: " + text.slice(0, 200));
     const parsed = JSON.parse(jsonMatch[0]);
