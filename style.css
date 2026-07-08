@@ -288,6 +288,7 @@ td.drag-cell {
   transform: translateY(-50%);
   background: linear-gradient(180deg, #8fdc7e, #4a9440);
   border-radius: 999px;
+  transition: width 3s cubic-bezier(0.33, 1, 0.68, 1);
   z-index: 0;
 }
 
