@@ -20,7 +20,7 @@ body {
 }
 
 .app-header {
-  max-width: 720px;
+  max-width: 480px;
   margin: 0 auto 24px;
   text-align: center;
 }
@@ -37,7 +37,7 @@ body {
 }
 
 .stack {
-  max-width: 720px;
+  max-width: 480px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
