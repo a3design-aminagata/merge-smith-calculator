@@ -14,6 +14,29 @@
   <button id="menu-close" class="side-menu-close" aria-label="閉じる">✕</button>
   <h3>メニュー</h3>
   <a href="./reference.html">📋 アイコン参考資料</a>
+
+  <div class="menu-divider"></div>
+
+  <h2><img src="./icons/icon-log.png" class="h2-icon" alt="" /> ② ステージ設定（丸太の獲得倍率）</h2>
+  <p class="note">クリアするステージ番号の一の位によって、1回のクリアでもらえる丸太（素材）の数が変わる想定。数値は暫定なので、実際と違ったら自由に書き換えてください。</p>
+
+  <div class="row">
+    <label for="stage-number">今のステージ番号（下2桁でOK）</label>
+    <input type="number" id="stage-number" min="0" placeholder="例: 19" />
+    <span class="hint">一の位: <b id="stage-digit">-</b> → 今回の獲得倍率: <b id="stage-multiplier">-</b></span>
+  </div>
+
+  <div class="row">
+    <label for="boost-toggle"><input type="checkbox" id="boost-toggle" /> x2ブースト系アイテムを持っている</label>
+    <span class="hint">ONにすると下の表の値がさらに2倍される（5→10, 9→20 のイメージ）</span>
+  </div>
+
+  <div class="row digit-table-header">
+    <span class="standard-badge">標準倍率</span>
+    <button class="btn-add" id="toggle-edit-digits">🔒 編集する</button>
+  </div>
+  <div class="digit-table-wrap"><table class="digit-table" id="digit-table"></table></div>
+  <p class="note warn">⚠️ 2, 5, 9 の位は確認済み（x3, x5, x10）。0, 1, 4, 6, 7, 8 はまだ未確認（暫定x1）。編集するには上の「編集する」を押してください。</p>
 </nav>
 
 <header class="app-header">
@@ -53,29 +76,6 @@
     <div class="board-grid" id="board-grid"></div>
     <p class="note" id="board-summary">現在の盤面: (空)</p>
     <button class="btn-add" id="board-clear">盤面を全部空にする</button>
-  </section>
-
-  <section class="card">
-    <h2><img src="./icons/icon-log.png" class="h2-icon" alt="" /> ② ステージ設定（丸太の獲得倍率）</h2>
-    <p class="note">クリアするステージ番号の一の位によって、1回のクリアでもらえる丸太（素材）の数が変わる想定。数値は暫定なので、実際と違ったら自由に書き換えてください。</p>
-
-    <div class="row">
-      <label for="stage-number">今のステージ番号（下2桁でOK）</label>
-      <input type="number" id="stage-number" min="0" placeholder="例: 19" />
-      <span class="hint">一の位: <b id="stage-digit">-</b> → 今回の獲得倍率: <b id="stage-multiplier">-</b></span>
-    </div>
-
-    <div class="row">
-      <label for="boost-toggle"><input type="checkbox" id="boost-toggle" /> x2ブースト系アイテムを持っている</label>
-      <span class="hint">ONにすると下の表の値がさらに2倍される（5→10, 9→20 のイメージ）</span>
-    </div>
-
-    <div class="row digit-table-header">
-      <span class="standard-badge">標準倍率</span>
-      <button class="btn-add" id="toggle-edit-digits">🔒 編集する</button>
-    </div>
-    <div class="digit-table-wrap"><table class="digit-table" id="digit-table"></table></div>
-    <p class="note warn">⚠️ 2, 5, 9 の位は確認済み（x3, x5, x10）。0, 1, 4, 6, 7, 8 はまだ未確認（暫定x1）。編集するには上の「編集する」を押してください。</p>
   </section>
 
   <section class="card">

@@ -163,14 +163,29 @@
   top: 0;
   right: 0;
   height: 100%;
-  width: 240px;
-  max-width: 80vw;
+  width: 320px;
+  max-width: 88vw;
   background: var(--card-bg);
   border-left: 1px solid var(--border);
   z-index: 60;
   padding: 20px 16px;
   transform: translateX(100%);
   transition: transform 0.2s ease;
+  overflow-y: auto;
+}
+
+.menu-divider {
+  border-top: 1px solid var(--border);
+  margin: 18px 0 16px;
+}
+
+.side-menu h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+  color: var(--accent);
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .side-menu.open {
