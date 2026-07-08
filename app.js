@@ -168,6 +168,13 @@ function renderProgressBar() {
 }
 
 function updateProgressBarFill(doneCount) {
+  const prevDoneCount = Number(progressBarFillEl.dataset.doneCount || 0);
+  progressBarFillEl.dataset.doneCount = doneCount;
+
+  // 最初の1本目が完了する瞬間だけ、3倍ゆっくり・ease-out（速い→遅い）で伸ばす
+  const isFirstFill = prevDoneCount === 0 && doneCount === 1;
+  progressBarFillEl.style.transition = isFirstFill ? "width 0.75s ease-out" : "";
+
   if (doneCount <= 0) {
     progressBarFillEl.style.width = "0px";
     return;
