@@ -118,7 +118,7 @@ goalStartTierInput.addEventListener("input", () => { recomputeGoalTiers(); saveS
 
 const progressBarEl = document.getElementById("progress-bar");
 const progressBarFillEl = document.getElementById("progress-bar-fill");
-let progressBarFillSpeedUpTimer = null;
+let progressBarFillAnimId = null;
 
 function requiredFor(qtyInput) {
   const q = Number(qtyInput.value) || 0;
@@ -171,17 +171,28 @@ function renderProgressBar() {
 function updateProgressBarFill(doneCount) {
   const items = [...progressBarEl.querySelectorAll(".progress-item")];
   const lastDone = doneCount > 0 ? items[doneCount - 1] : null;
-  const targetWidth = lastDone ? `${lastDone.offsetLeft + lastDone.offsetWidth}px` : "0px";
+  const targetWidth = lastDone ? lastDone.offsetLeft + lastDone.offsetWidth : 0;
+  const startWidth = progressBarFillEl.getBoundingClientRect().width;
+  const duration = 3000; // 伸びる速さ(ms)。数値を変えるだけで調整可能
 
-  // 最初はCSSの通り(10s)でじわっと伸ばし、3秒経ったら残りを1秒で書き終える
-  clearTimeout(progressBarFillSpeedUpTimer);
-  progressBarFillEl.style.transition = "";
-  progressBarFillEl.style.width = targetWidth;
+  if (progressBarFillAnimId) cancelAnimationFrame(progressBarFillAnimId);
+  progressBarFillEl.style.transition = "none";
 
-  progressBarFillSpeedUpTimer = setTimeout(() => {
-    progressBarFillEl.style.transition = "width 1s ease";
-    progressBarFillEl.style.width = targetWidth;
-  }, 3000);
+  if (startWidth === targetWidth) {
+    progressBarFillEl.style.width = `${targetWidth}px`;
+    return;
+  }
+
+  const startTime = performance.now();
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3); // 最初速く、だんだん遅く
+
+  const step = (now) => {
+    const t = Math.min((now - startTime) / duration, 1);
+    const eased = easeOutCubic(t);
+    progressBarFillEl.style.width = `${startWidth + (targetWidth - startWidth) * eased}px`;
+    progressBarFillAnimId = t < 1 ? requestAnimationFrame(step) : null;
+  };
+  progressBarFillAnimId = requestAnimationFrame(step);
 }
 
 // --- drag-to-reorder (mouse + touch) ---------------------------------------
