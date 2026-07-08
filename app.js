@@ -381,9 +381,10 @@ document.getElementById("analyze-image").addEventListener("click", async () => {
     const schemaPrompt = `これはスマホゲーム「Royal Match」の「Merge Smith」というマージイベントの盤面スクリーンショットです。
 盤面上に置かれているアイテム（丸太・板・盾・兜・剣・鎧・マントなど）を種類ごとに数えてください。
 同じ見た目のアイコンは同じ「段数」として扱い、より原始的な素材（丸太など）を段数0、そこから合成が進んだ見た目ほど段数を1,2,3...と上げてください（正確な段数が分からない場合は見た目の複雑さで推測してよいです）。
-上部の進行バー（Final Goal に向けた目標アイテム列）が見えれば、そこに並ぶ完成アイテム名も列挙してください。
+上部の進行バー（Final Goal に向けた目標アイテム列）が見えれば、そこに並ぶ完成アイテム名を左から順に列挙してください。
+さらに、その進行バーのうち何番目まで（左から数えて）すでに完了（緑のラインより左・チェック済みなど）になっているかを goalBarCompletedCount として数字で返してください（例: 左2つが完了済みなら2）。進行バー自体が写っていない・完了状況が判断できない場合は goalBarCompletedCount を省略してください。
 以下のJSON形式のみで出力してください（説明文不要）:
-{"inventory":[{"name":"日本語の短い名前","tier":0,"count":1}],"goalItemNames":["名前1","名前2"]}`;
+{"inventory":[{"name":"日本語の短い名前","tier":0,"count":1}],"goalItemNames":["名前1","名前2"],"goalBarCompletedCount":0}`;
 
     const res = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
@@ -432,7 +433,28 @@ document.getElementById("analyze-image").addEventListener("click", async () => {
     renderBoardGrid();
     updateBoardSummary();
 
-    status.textContent = `解析完了。目標${(parsed.goalItemNames || []).length}件を追加し、盤面に${placed}個を配置しました。${skipped ? `（盤面が満杯のため${skipped}個は未配置）` : ""}内容を確認・修正してください。`;
+    let progressMsg = "";
+    const goalItemNames = parsed.goalItemNames || [];
+    if (typeof parsed.goalBarCompletedCount === "number" && goalItemNames.length > 0) {
+      const n = Math.max(0, Math.min(parsed.goalBarCompletedCount, goalItemNames.length));
+      const rows = [...goalBody.querySelectorAll("tr")];
+      if (n > 0) {
+        const targetName = goalItemNames[n - 1];
+        const idx = rows.findIndex((tr) => tr.querySelector(".goal-name").value.trim() === targetName);
+        if (idx !== -1) {
+          rows.forEach((r, i) => {
+            r.querySelector(".goal-banked").value = i <= idx ? requiredFor(r.querySelector(".goal-qty")) : 0;
+          });
+          progressMsg = `進行状況も「${targetName}」まで完了に反映しました。`;
+        }
+      } else {
+        rows.forEach((r) => { r.querySelector(".goal-banked").value = 0; });
+        progressMsg = "進行状況は未着手として反映しました。";
+      }
+      renderProgressBar();
+    }
+
+    status.textContent = `解析完了。目標${goalItemNames.length}件を追加し、盤面に${placed}個を配置しました。${skipped ? `（盤面が満杯のため${skipped}個は未配置）` : ""}${progressMsg}内容を確認・修正してください。`;
   } catch (err) {
     status.textContent = "解析に失敗しました: " + err.message;
   }
