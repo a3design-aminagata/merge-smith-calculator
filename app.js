@@ -69,7 +69,7 @@ boostToggle.addEventListener("change", () => { updateStageMultiplier(); saveStat
 
 // --- goal table ----------------------------------------------------------
 
-const goalStartTierInput = document.getElementById("goal-start-tier");
+const crownLogsBadge = document.getElementById("crown-logs-badge");
 
 function addGoalRow(name = "", icon = "") {
   const tr = document.createElement("tr");
@@ -77,7 +77,6 @@ function addGoalRow(name = "", icon = "") {
   tr.innerHTML = `
     <td class="drag-cell"><span class="row-drag" title="ドラッグして並び替え">⠿</span></td>
     <td class="name-cell">${iconHtml}<input type="text" class="goal-name" value="${name}" placeholder="例: 剣" /></td>
-    <td><span class="goal-tier-badge">-</span></td>
     <td><span class="goal-logs-badge">-</span></td>
     <td><button class="row-remove" title="削除">✕</button></td>
   `;
@@ -99,18 +98,15 @@ function addGoalRow(name = "", icon = "") {
 document.getElementById("add-goal-row").addEventListener("click", () => { addGoalRow(); saveState(); });
 
 function recomputeGoalTiers() {
-  const start = Number(goalStartTierInput.value) || 0;
-  [...goalBody.querySelectorAll("tr")].forEach((tr, idx) => {
-    const tier = start + idx;
+  const rows = [...goalBody.querySelectorAll("tr")];
+  rows.forEach((tr, idx) => {
+    const tier = idx + 1;
     tr.dataset.tier = String(tier);
-    const badge = tr.querySelector(".goal-tier-badge");
-    if (badge) badge.textContent = tier;
     const logsBadge = tr.querySelector(".goal-logs-badge");
     if (logsBadge) logsBadge.textContent = Math.pow(2, tier);
   });
+  if (crownLogsBadge) crownLogsBadge.textContent = Math.pow(2, rows.length + 1);
 }
-
-goalStartTierInput.addEventListener("input", () => { recomputeGoalTiers(); saveState(); });
 
 // --- drag-to-reorder (mouse + touch) ---------------------------------------
 
@@ -410,7 +406,6 @@ function saveState() {
     digits: Object.fromEntries(
       [...digitTable.querySelectorAll("input[data-digit]")].map((inp) => [inp.dataset.digit, inp.value])
     ),
-    goalStartTier: goalStartTierInput.value,
     goalRows: [...goalBody.querySelectorAll("tr")].map((tr) => {
       const iconImg = tr.querySelector(".name-cell img.row-icon");
       return {
@@ -460,7 +455,6 @@ if (savedState) {
       if (inp) inp.value = v;
     });
   }
-  goalStartTierInput.value = savedState.goalStartTier ?? "1";
   const rows = savedState.goalRows && savedState.goalRows.length ? savedState.goalRows : DEFAULT_GOAL_ROWS;
   rows.forEach((r) => addGoalRow(r.name, r.icon));
   finalGoalTargetInput.value = savedState.finalGoalTarget || "";
