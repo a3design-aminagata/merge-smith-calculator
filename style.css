@@ -257,6 +257,13 @@ td.drag-cell {
   font-weight: 600;
 }
 
+.goal-logs-badge {
+  display: inline-block;
+  min-width: 2.4em;
+  color: var(--accent2);
+  font-weight: 600;
+}
+
 /* --- board grid (section③) --- */
 
 .board-grid {

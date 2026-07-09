@@ -49,7 +49,7 @@
     <span class="hint">丸太=0が基準。以降の行は自動で +1, +2... と積み上がります</span>
   </div>
   <div class="table-wrap"><table class="goal-table" id="goal-table">
-    <thead><tr><th></th><th>アイテム名</th><th>段数<br><span class="th-note">(自動計算)</span></th><th></th></tr></thead>
+    <thead><tr><th></th><th>アイテム名</th><th>段数<br><span class="th-note">(自動計算)</span></th><th>丸太換算<br><span class="th-note">(2^段数)</span></th><th></th></tr></thead>
     <tbody id="goal-body"></tbody>
   </table></div>
   <button class="btn-add" id="add-goal-row">+ 行を追加</button>
@@ -88,9 +88,9 @@
   <section class="card result-card">
     <h2>2 見積もり結果</h2>
     <div class="row">
-      <label for="final-goal-target">Final Goalに必要な丸太換算合計</label>
+      <label for="final-goal-target">王冠(Final Goal)に必要な丸太換算合計</label>
       <input type="number" id="final-goal-target" min="0" placeholder="例: 2000" />
-      <span class="hint">今の盤面の合計丸太換算と比較して残りを計算します</span>
+      <span class="hint">メニュー内「アイテム設定」の丸太換算列を参考に、王冠を貰うのに実際必要な数(例: マント5個なら段数から出る値×5)を入力。今の盤面の合計丸太換算と比較して残りを計算します</span>
     </div>
     <button class="btn-calc" id="calc-btn">残りゲーム数を計算</button>
     <div id="result"></div>

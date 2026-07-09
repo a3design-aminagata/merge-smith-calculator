@@ -78,6 +78,7 @@ function addGoalRow(name = "", icon = "") {
     <td class="drag-cell"><span class="row-drag" title="ドラッグして並び替え">⠿</span></td>
     <td class="name-cell">${iconHtml}<input type="text" class="goal-name" value="${name}" placeholder="例: 剣" /></td>
     <td><span class="goal-tier-badge">-</span></td>
+    <td><span class="goal-logs-badge">-</span></td>
     <td><button class="row-remove" title="削除">✕</button></td>
   `;
   tr.querySelector(".row-remove").addEventListener("click", () => {
@@ -104,6 +105,8 @@ function recomputeGoalTiers() {
     tr.dataset.tier = String(tier);
     const badge = tr.querySelector(".goal-tier-badge");
     if (badge) badge.textContent = tier;
+    const logsBadge = tr.querySelector(".goal-logs-badge");
+    if (logsBadge) logsBadge.textContent = Math.pow(2, tier);
   });
 }
 
