@@ -257,122 +257,6 @@ td.drag-cell {
   font-weight: 600;
 }
 
-/* --- progress bar (mirrors the in-game Final Goal bar) --- */
-
-.progress-bar-row {
-  display: flex;
-  align-items: stretch;
-  gap: 6px;
-  background: linear-gradient(180deg, #f6c94a, #e0a52a);
-  border: 2px solid #b9821c;
-  border-radius: 999px;
-  padding: 6px;
-  margin-bottom: 6px;
-}
-
-.progress-bar {
-  flex: 1;
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  overflow-x: auto;
-  scrollbar-width: none;
-  scroll-behavior: smooth;
-}
-
-.progress-bar::-webkit-scrollbar {
-  display: none;
-}
-
-.progress-bar-fill {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  height: 10px;
-  width: 0;
-  transform: translateY(-50%);
-  background: linear-gradient(180deg, #8fdc7e, #4a9440);
-  border-radius: 999px;
-  transition: width 3s cubic-bezier(0.33, 1, 0.68, 1);
-  z-index: 0;
-}
-
-.progress-item {
-  flex: 0 0 auto;
-  width: 46px;
-  height: 46px;
-  background: rgba(255, 255, 255, 0.35);
-  border: 1px solid rgba(0, 0, 0, 0.15);
-  border-radius: 10px;
-  cursor: pointer;
-  position: relative;
-  z-index: 1;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.progress-item:active {
-  transform: scale(0.92);
-}
-
-.progress-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-
-.progress-item .cell-label {
-  font-size: 0.55rem;
-  color: #4a3a26;
-  text-align: center;
-}
-
-.progress-item.done::after {
-  content: "✓";
-  position: absolute;
-  bottom: -6px;
-  right: -6px;
-  background: #4a9440;
-  color: #fff;
-  font-size: 0.6rem;
-  font-weight: 700;
-  border-radius: 999px;
-  width: 15px;
-  height: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #2a1a00;
-}
-
-.progress-final {
-  flex: 0 0 auto;
-  width: 58px;
-  background: linear-gradient(180deg, #e94f6b, #b81f3f);
-  border: 2px solid #ffd76a;
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  color: #fff;
-  font-size: 0.55rem;
-  font-weight: 700;
-  line-height: 1.15;
-  text-align: center;
-}
-
-.progress-final img {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  margin-bottom: 2px;
-}
-
 /* --- board grid (section③) --- */
 
 .board-grid {
@@ -573,4 +457,12 @@ td.drag-cell {
 
 .result-breakdown span.name {
   color: var(--text);
+}
+
+.result-breakdown .result-sep {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+  color: var(--accent2);
+  font-size: 0.78rem;
 }
