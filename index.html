@@ -19,13 +19,7 @@
   <div class="menu-divider"></div>
 
   <h2><img src="./icons/icon-log.png" class="h2-icon" alt="" /> ステージ設定（丸太の獲得倍率）</h2>
-  <p class="note">クリアするステージ番号の一の位によって、1回のクリアでもらえる丸太（素材）の数が変わる想定。数値は暫定なので、実際と違ったら自由に書き換えてください。</p>
-
-  <div class="row">
-    <label for="stage-number">今のステージ番号（下2桁でOK）</label>
-    <input type="number" id="stage-number" min="0" placeholder="例: 19" />
-    <span class="hint">一の位: <b id="stage-digit">-</b> → 今回の獲得倍率: <b id="stage-multiplier">-</b></span>
-  </div>
+  <p class="note">クリアするステージ番号の一の位によって、1回のクリアでもらえる丸太（素材）の数が変わる想定。見積もり結果では一の位0〜9のパターン全部を並べて表示するので、ここでは倍率だけ設定してください。数値は暫定なので、実際と違ったら自由に書き換えてください。</p>
 
   <div class="row">
     <label for="boost-toggle"><input type="checkbox" id="boost-toggle" /> x2ブースト系アイテムを持っている</label>
@@ -98,11 +92,7 @@
 
   <section class="card result-card">
     <h2>2 見積もり結果</h2>
-    <div class="row">
-      <label for="final-goal-target">王冠(Final Goal)に必要な丸太換算合計</label>
-      <input type="number" id="final-goal-target" min="0" placeholder="例: 2000" />
-      <span class="hint">メニュー内「アイテム設定」の丸太換算列を参考に、王冠を貰うのに実際必要な数(例: マント5個なら段数から出る値×5)を入力。今の盤面の合計丸太換算と比較して残りを計算します</span>
-    </div>
+    <p class="note">目標(王冠に必要な丸太換算)はメニュー内「アイテム設定」の一番下の行から自動で決まります。ステージ番号の一の位ごとに、あと何ゲーム必要かをまとめて表示します。</p>
     <button class="btn-calc" id="calc-btn">残りゲーム数を計算</button>
     <div id="result"></div>
   </section>

@@ -163,8 +163,8 @@
   top: 0;
   right: 0;
   height: 100%;
-  width: 320px;
-  max-width: 88vw;
+  width: 520px;
+  max-width: 94vw;
   background: var(--card-bg);
   border-left: 1px solid var(--border);
   z-index: 60;

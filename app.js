@@ -3,9 +3,6 @@
 const DIGIT_DEFAULTS = { 0: 1, 1: 1, 2: 3, 3: 1, 4: 1, 5: 5, 6: 1, 7: 1, 8: 1, 9: 10 };
 
 const digitTable = document.getElementById("digit-table");
-const stageInput = document.getElementById("stage-number");
-const stageDigitEl = document.getElementById("stage-digit");
-const stageMultEl = document.getElementById("stage-multiplier");
 const boostToggle = document.getElementById("boost-toggle");
 
 const goalBody = document.getElementById("goal-body");
@@ -27,7 +24,7 @@ function renderDigitTable() {
     inp.dataset.digit = String(d);
     inp.value = DIGIT_DEFAULTS[d];
     inp.disabled = true;
-    inp.addEventListener("input", () => { updateStageMultiplier(); saveState(); });
+    inp.addEventListener("input", saveState);
     td.appendChild(inp);
     valRow.appendChild(td);
   }
@@ -50,22 +47,7 @@ function getDigitValue(d) {
   return inp ? Number(inp.value) || 0 : 0;
 }
 
-function updateStageMultiplier() {
-  const n = stageInput.value.trim();
-  if (n === "" || isNaN(n)) {
-    stageDigitEl.textContent = "-";
-    stageMultEl.textContent = "-";
-    return;
-  }
-  const digit = Number(n) % 10;
-  const base = getDigitValue(digit);
-  const mult = boostToggle.checked ? base * 2 : base;
-  stageDigitEl.textContent = digit;
-  stageMultEl.textContent = `丸太 x${mult}`;
-}
-
-stageInput.addEventListener("input", () => { updateStageMultiplier(); saveState(); });
-boostToggle.addEventListener("change", () => { updateStageMultiplier(); saveState(); });
+boostToggle.addEventListener("change", saveState);
 
 // --- goal table ----------------------------------------------------------
 
@@ -263,11 +245,12 @@ document.getElementById("board-clear").addEventListener("click", () => {
 
 // --- calculation -----------------------------------------------------------
 
-const finalGoalTargetInput = document.getElementById("final-goal-target");
-finalGoalTargetInput.addEventListener("input", saveState);
+function goalTarget() {
+  return Math.pow(2, goalBody.querySelectorAll("tr").length + 1);
+}
 
 document.getElementById("calc-btn").addEventListener("click", () => {
-  const target = Number(finalGoalTargetInput.value) || 0;
+  const target = goalTarget();
 
   const invByName = {};
   let haveTotal = 0;
@@ -278,13 +261,14 @@ document.getElementById("calc-btn").addEventListener("click", () => {
     haveTotal += value;
   });
 
-  const n = stageInput.value.trim();
-  const digit = n === "" || isNaN(n) ? 0 : Number(n) % 10;
-  const base = getDigitValue(digit);
-  const logsPerGame = Math.max(1, boostToggle.checked ? base * 2 : base);
-
   const remaining = Math.max(0, target - haveTotal);
-  const gamesNeeded = remaining > 0 ? Math.ceil(remaining / logsPerGame) : 0;
+
+  const perDigitLines = Array.from({ length: 10 }, (_, d) => {
+    const base = getDigitValue(d);
+    const logsPerGame = Math.max(1, boostToggle.checked ? base * 2 : base);
+    const gamesNeeded = remaining > 0 ? Math.ceil(remaining / logsPerGame) : 0;
+    return `<div><span class="name">一の位が${d}のとき</span><span>あと ${gamesNeeded} ゲーム（丸太換算 ${logsPerGame}/回）</span></div>`;
+  }).join("");
 
   const invLines = Object.entries(invByName)
     .map(([name, value]) => `<div><span class="name">${name}</span><span>丸太換算 ${value}</span></div>`)
@@ -292,13 +276,13 @@ document.getElementById("calc-btn").addEventListener("click", () => {
 
   const resultEl = document.getElementById("result");
   resultEl.innerHTML = `
-    <div class="result-total">残り 約 ${gamesNeeded} ゲーム</div>
     <div class="result-breakdown">
-      <div><span>1ゲームあたり獲得</span><span>丸太換算 ${logsPerGame}</span></div>
       <div><span>目標合計</span><span>丸太換算 ${target}</span></div>
       <div><span>盤面の保有合計</span><span>丸太換算 ${haveTotal}</span></div>
       <div><span>不足</span><span>丸太換算 ${remaining}</span></div>
       ${invLines ? `<div class="result-sep">盤面の内訳</div>${invLines}` : ""}
+      <div class="result-sep">ステージの一の位ごとの残りゲーム数</div>
+      ${perDigitLines}
     </div>
   `;
 });
@@ -401,7 +385,6 @@ const STATE_STORAGE_KEY = "mergeSmithState";
 
 function saveState() {
   const state = {
-    stageNumber: stageInput.value,
     boost: boostToggle.checked,
     digits: Object.fromEntries(
       [...digitTable.querySelectorAll("input[data-digit]")].map((inp) => [inp.dataset.digit, inp.value])
@@ -413,7 +396,6 @@ function saveState() {
         icon: iconImg ? iconImg.getAttribute("src").split("/").pop() : "",
       };
     }),
-    finalGoalTarget: finalGoalTargetInput.value,
     boardCells,
   };
   localStorage.setItem(STATE_STORAGE_KEY, JSON.stringify(state));
@@ -447,7 +429,6 @@ renderDigitTable();
 
 const savedState = loadState();
 if (savedState) {
-  stageInput.value = savedState.stageNumber || "";
   boostToggle.checked = !!savedState.boost;
   if (savedState.digits) {
     Object.entries(savedState.digits).forEach(([d, v]) => {
@@ -457,7 +438,6 @@ if (savedState) {
   }
   const rows = savedState.goalRows && savedState.goalRows.length ? savedState.goalRows : DEFAULT_GOAL_ROWS;
   rows.forEach((r) => addGoalRow(r.name, r.icon));
-  finalGoalTargetInput.value = savedState.finalGoalTarget || "";
   if (Array.isArray(savedState.boardCells) && savedState.boardCells.length === BOARD_ROWS * BOARD_COLS) {
     boardCells = savedState.boardCells;
   }
@@ -465,6 +445,5 @@ if (savedState) {
   DEFAULT_GOAL_ROWS.forEach((r) => addGoalRow(r.name, r.icon));
 }
 
-updateStageMultiplier();
 renderBoardGrid();
 updateBoardSummary();
