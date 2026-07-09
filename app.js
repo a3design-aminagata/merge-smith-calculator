@@ -172,6 +172,12 @@ function updateProgressBarFill(doneCount) {
   const lastDone = doneCount > 0 ? items[doneCount - 1] : null;
   const targetWidth = lastDone ? lastDone.offsetLeft + lastDone.offsetWidth : 0;
   progressBarFillEl.style.width = `${targetWidth}px`;
+
+  const maxScroll = progressBarEl.scrollWidth - progressBarEl.clientWidth;
+  const targetScroll = lastDone
+    ? Math.min(maxScroll, Math.max(0, lastDone.offsetLeft + lastDone.offsetWidth - progressBarEl.clientWidth))
+    : 0;
+  progressBarEl.scrollLeft = targetScroll;
 }
 
 // --- drag-to-reorder (mouse + touch) ---------------------------------------
@@ -531,10 +537,10 @@ const DEFAULT_GOAL_ROWS = [
   { name: "紋章の盾", qty: "", banked: "1", icon: "icon-shield.png" },
   { name: "兜", qty: "", banked: "1", icon: "icon-helmet.png" },
   { name: "剣（1本）", qty: "", banked: "1", icon: "icon-sword-single.png" },
-  { name: "剣", qty: "", banked: "0", icon: "icon-sword.png" },
-  { name: "弓矢", qty: "", banked: "0", icon: "icon-bow.png" },
-  { name: "鎧", qty: "", banked: "0", icon: "icon-armor.png" },
-  { name: "マント", qty: "", banked: "0", icon: "icon-cape.png" },
+  { name: "剣", qty: "", banked: "1", icon: "icon-sword.png" },
+  { name: "弓矢", qty: "", banked: "1", icon: "icon-bow.png" },
+  { name: "鎧", qty: "", banked: "1", icon: "icon-armor.png" },
+  { name: "マント", qty: "", banked: "1", icon: "icon-cape.png" },
 ];
 
 renderDigitTable();
