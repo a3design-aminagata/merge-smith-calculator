@@ -229,14 +229,6 @@ td.name-cell input {
   padding: 4px;
 }
 
-.row-remove {
-  background: none;
-  border: none;
-  color: var(--danger);
-  cursor: pointer;
-  font-size: 1rem;
-}
-
 td.drag-cell {
   padding: 6px 0;
   width: 28px;
@@ -484,4 +476,19 @@ td.drag-cell {
   border-top: 1px dashed var(--border);
   color: var(--accent2);
   font-size: 0.78rem;
+}
+
+.mini-result-table {
+  width: 100%;
+  min-width: 0;
+}
+
+.mini-result-table th, .mini-result-table td {
+  padding: 4px 2px;
+  font-size: 0.8rem;
+}
+
+.mini-result-table td {
+  color: var(--text);
+  font-weight: 600;
 }

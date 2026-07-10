@@ -60,17 +60,7 @@ function addGoalRow(name = "", icon = "") {
     <td class="drag-cell"><span class="row-drag" title="ドラッグして並び替え">⠿</span></td>
     <td class="name-cell">${iconHtml}<input type="text" class="goal-name" value="${name}" placeholder="例: 剣" /></td>
     <td><span class="goal-logs-badge">-</span></td>
-    <td><button class="row-remove" title="削除">✕</button></td>
   `;
-  tr.querySelector(".row-remove").addEventListener("click", () => {
-    const removedName = tr.querySelector(".goal-name").value.trim();
-    tr.remove();
-    boardCells = boardCells.map((v) => (v === removedName ? null : v));
-    recomputeGoalTiers();
-    renderBoardGrid();
-    updateBoardSummary();
-    saveState();
-  });
   tr.querySelector(".goal-name").addEventListener("input", saveState);
   enableRowDrag(tr, tr.querySelector(".row-drag"));
   goalBody.appendChild(tr);
@@ -249,6 +239,26 @@ function goalTarget() {
   return Math.pow(2, goalBody.querySelectorAll("tr").length + 1);
 }
 
+function rewardForDigit(d) {
+  const base = getDigitValue(d);
+  return Math.max(1, boostToggle.checked ? base * 2 : base);
+}
+
+// 一の位はステージを1つクリアするごとに0→1→2→...→9→0と巡回するので、
+// 開始する一の位から順に報酬を足していき、不足分に届くまでのゲーム数を数える
+function gamesNeededFrom(startDigit, remaining) {
+  if (remaining <= 0) return 0;
+  let total = 0;
+  let games = 0;
+  let d = startDigit;
+  while (total < remaining) {
+    total += rewardForDigit(d);
+    games++;
+    d = (d + 1) % 10;
+  }
+  return games;
+}
+
 document.getElementById("calc-btn").addEventListener("click", () => {
   const target = goalTarget();
 
@@ -263,12 +273,8 @@ document.getElementById("calc-btn").addEventListener("click", () => {
 
   const remaining = Math.max(0, target - haveTotal);
 
-  const perDigitLines = Array.from({ length: 10 }, (_, d) => {
-    const base = getDigitValue(d);
-    const logsPerGame = Math.max(1, boostToggle.checked ? base * 2 : base);
-    const gamesNeeded = remaining > 0 ? Math.ceil(remaining / logsPerGame) : 0;
-    return `<div><span class="name">一の位が${d}のとき</span><span>あと ${gamesNeeded} ゲーム（丸太換算 ${logsPerGame}/回）</span></div>`;
-  }).join("");
+  const perDigitCells = Array.from({ length: 10 }, (_, d) => `<td>${gamesNeededFrom(d, remaining)}</td>`).join("");
+  const digitHeaderCells = Array.from({ length: 10 }, (_, d) => `<th>${d}</th>`).join("");
 
   const invLines = Object.entries(invByName)
     .map(([name, value]) => `<div><span class="name">${name}</span><span>丸太換算 ${value}</span></div>`)
@@ -281,8 +287,11 @@ document.getElementById("calc-btn").addEventListener("click", () => {
       <div><span>盤面の保有合計</span><span>丸太換算 ${haveTotal}</span></div>
       <div><span>不足</span><span>丸太換算 ${remaining}</span></div>
       ${invLines ? `<div class="result-sep">盤面の内訳</div>${invLines}` : ""}
-      <div class="result-sep">ステージの一の位ごとの残りゲーム数</div>
-      ${perDigitLines}
+      <div class="result-sep">次のラウンド</div>
+      <div class="table-wrap"><table class="mini-result-table">
+        <thead><tr>${digitHeaderCells}</tr></thead>
+        <tbody><tr>${perDigitCells}</tr></tbody>
+      </table></div>
     </div>
   `;
 });
