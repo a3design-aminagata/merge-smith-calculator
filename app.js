@@ -399,7 +399,7 @@ document.getElementById("calc-btn").addEventListener("click", () => {
       ${invLines ? `<div class="result-sep">盤面の内訳</div>${invLines}` : ""}
       <div class="result-sep">👑までのゲーム数</div>
       <table class="mini-result-table">
-        <thead><tr><th>一の位</th><th>通常</th><th>x2</th><th>${nextHeader}</th><th>x2</th></tr></thead>
+        <thead><tr><th>一の位</th><th><img src="./icons/icon-crown.png" class="row-icon" alt="王冠" />まで</th><th>x2</th><th>${nextHeader}</th><th>x2</th></tr></thead>
         <tbody>${perDigitRows}</tbody>
       </table>
     </div>
