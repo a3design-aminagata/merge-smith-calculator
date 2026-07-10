@@ -342,7 +342,7 @@ function stageBonusTotal() {
 function missingBonusDataWarning() {
   const lowestTrigger = Math.min(...STAGE_BONUSES.map((b) => tierForName(b.triggerName)));
   if (boardHighestTier() >= lowestTrigger) return "";
-  return "⚠️ 盤面の一番高いアイテムが剣（1本）未満（丸太〜兜）のため、その段階の確定ボーナスがまだ未登録で、下の不足はやや多めに出ています。そのステージで最初から盤面に出ていたアイテムを教えてもらえれば追加できます。";
+  return "⚠️ 盤面の一番高いアイテムが剣（1本）未満（丸太〜兜）のため、その段階の確定ボーナスがまだ未登録で、下の不足はやや多めに出ています。";
 }
 
 function rewardForDigit(d, boosted) {
