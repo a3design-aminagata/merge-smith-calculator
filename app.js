@@ -390,8 +390,7 @@ document.getElementById("calc-btn").addEventListener("click", () => {
   const adjustedRemaining = Math.max(0, remaining - bonusTotal);
 
   const nextInfo = nextItemInfo();
-  const nextRemainingRaw = nextInfo === null ? null : Math.max(0, nextInfo.target - haveTotal);
-  const nextRemaining = nextRemainingRaw === null ? null : Math.max(0, nextRemainingRaw - bonusTotal);
+  const nextRemaining = nextInfo === null ? null : Math.max(0, nextInfo.target - haveTotal);
   const nextHeader = nextInfo
     ? (nextInfo.icon ? `<img src="./icons/${nextInfo.icon}" class="row-icon" alt="${nextInfo.name}" />` : nextInfo.name) + "まで"
     : "次アイテム";
