@@ -240,7 +240,7 @@ function goalTarget() {
 // 無料でもらえるアイテムがある。到達済みのものを全部足して不足から引く。
 const STAGE_BONUSES = [
   {
-    triggerName: "兜",
+    triggerName: "剣（1本）",
     rewardItems: [
       { name: "丸太", count: 12 },
       { name: "板", count: 4 },
@@ -248,12 +248,46 @@ const STAGE_BONUSES = [
     ],
   },
   {
-    triggerName: "剣（1本）",
+    triggerName: "剣",
     rewardItems: [
       { name: "丸太", count: 12 },
       { name: "板", count: 5 },
-      { name: "剣", count: 1 },
+      { name: "剣（1本）", count: 1 },
       { name: "宝石の盾", count: 1 },
+    ],
+  },
+  {
+    triggerName: "弓矢",
+    rewardItems: [
+      { name: "丸太", count: 7 },
+      { name: "板", count: 7 },
+      { name: "剣（1本）", count: 2 },
+      { name: "宝石の盾", count: 2 },
+      { name: "兜", count: 1 },
+      { name: "紋章の盾", count: 1 },
+    ],
+  },
+  {
+    triggerName: "鎧",
+    rewardItems: [
+      { name: "宝石の盾", count: 7 },
+      { name: "板", count: 6 },
+      { name: "丸太", count: 5 },
+      { name: "兜", count: 4 },
+      { name: "剣", count: 2 },
+    ],
+  },
+  {
+    triggerName: "マント",
+    rewardItems: [
+      { name: "板", count: 7 },
+      { name: "宝石の盾", count: 4 },
+      { name: "兜", count: 4 },
+      { name: "丸太", count: 4 },
+      { name: "剣", count: 3 },
+      { name: "剣（1本）", count: 2 },
+      { name: "弓矢", count: 1 },
+      { name: "紋章の盾", count: 1 },
     ],
   },
 ];
