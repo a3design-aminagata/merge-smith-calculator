@@ -312,15 +312,12 @@ td.drag-cell {
 }
 
 .board-cell {
+  position: relative;
   aspect-ratio: 1 / 1;
   background: #e8d9c0;
   border: 1px solid #c9b28c;
   border-radius: 8px;
   cursor: pointer;
-  padding: 8%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   transition: background 0.15s ease, transform 0.1s ease;
 }
 
@@ -337,12 +334,25 @@ td.drag-cell {
 }
 
 .board-cell img {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  top: 8%;
+  right: 8%;
+  bottom: 8%;
+  left: 8%;
+  width: 84%;
+  height: 84%;
   object-fit: contain;
 }
 
 .board-cell .cell-label {
+  position: absolute;
+  top: 8%;
+  right: 8%;
+  bottom: 8%;
+  left: 8%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-size: 0.62rem;
   color: #4a3a26;
   text-align: center;
