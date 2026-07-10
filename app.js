@@ -241,7 +241,7 @@ function goalTarget() {
 // 無料でもらえるアイテムがある。到達済みのものを全部足して不足から引く。
 const STAGE_BONUSES = [
   {
-    triggerName: "剣（1本）",
+    triggerName: "シングルソード",
     rewardItems: [
       { name: "丸太", count: 12 },
       { name: "板", count: 4 },
@@ -249,12 +249,12 @@ const STAGE_BONUSES = [
     ],
   },
   {
-    triggerName: "剣",
+    triggerName: "クロスソード",
     rewardItems: [
       { name: "丸太", count: 12 },
       { name: "板", count: 5 },
-      { name: "剣（1本）", count: 1 },
-      { name: "宝石の盾", count: 1 },
+      { name: "シングルソード", count: 1 },
+      { name: "青の盾", count: 1 },
     ],
   },
   {
@@ -262,33 +262,33 @@ const STAGE_BONUSES = [
     rewardItems: [
       { name: "丸太", count: 7 },
       { name: "板", count: 7 },
-      { name: "剣（1本）", count: 2 },
-      { name: "宝石の盾", count: 2 },
+      { name: "シングルソード", count: 2 },
+      { name: "青の盾", count: 2 },
       { name: "兜", count: 1 },
-      { name: "紋章の盾", count: 1 },
+      { name: "金の盾", count: 1 },
     ],
   },
   {
     triggerName: "鎧",
     rewardItems: [
-      { name: "宝石の盾", count: 7 },
+      { name: "青の盾", count: 7 },
       { name: "板", count: 6 },
       { name: "丸太", count: 5 },
       { name: "兜", count: 4 },
-      { name: "剣", count: 2 },
+      { name: "クロスソード", count: 2 },
     ],
   },
   {
     triggerName: "マント",
     rewardItems: [
       { name: "板", count: 7 },
-      { name: "宝石の盾", count: 4 },
+      { name: "青の盾", count: 4 },
       { name: "兜", count: 4 },
       { name: "丸太", count: 4 },
-      { name: "剣", count: 3 },
-      { name: "剣（1本）", count: 2 },
+      { name: "クロスソード", count: 3 },
+      { name: "シングルソード", count: 2 },
       { name: "弓矢", count: 1 },
-      { name: "紋章の盾", count: 1 },
+      { name: "金の盾", count: 1 },
     ],
   },
 ];
@@ -353,8 +353,8 @@ function nextItemInfo() {
   return { name, icon, target: Math.pow(2, nextTier) };
 }
 
-// STAGE_BONUSESは剣（1本）到達時点からしか登録していない。兜到達時点の
-// ボーナスはまだ未登録なので、盤面の一番高いアイテムが兜未満（紋章の盾以下）
+// STAGE_BONUSESはシングルソード到達時点からしか登録していない。兜到達時点の
+// ボーナスはまだ未登録なので、盤面の一番高いアイテムが兜未満（金の盾以下）
 // だと、pendingStageBonusTotalがその分を拾えずゲーム数がやや多めに出る
 function missingBonusDataWarning() {
   if (boardHighestTier() >= tierForName("兜")) return "";
@@ -444,19 +444,13 @@ document.getElementById("calc-btn").addEventListener("click", () => {
 
 // --- AI image fill (optional) -----------------------------------------------
 
-const apiKeyInput = document.getElementById("api-key");
-apiKeyInput.value = localStorage.getItem("mergeSmithApiKey") || "";
-apiKeyInput.addEventListener("input", () => {
-  localStorage.setItem("mergeSmithApiKey", apiKeyInput.value);
-});
+const GEMINI_PROXY_URL = "https://merge-smith-gemini-proxy.ami-nagata.workers.dev";
 
 document.getElementById("analyze-image").addEventListener("click", async () => {
   const status = document.getElementById("analyze-status");
   const fileInput = document.getElementById("board-image");
-  const apiKey = apiKeyInput.value.trim();
   const file = fileInput.files[0];
 
-  if (!apiKey) { status.textContent = "APIキーを入力してください。"; return; }
   if (!file) { status.textContent = "画像を選択してください。"; return; }
 
   status.textContent = "解析中...";
@@ -464,29 +458,27 @@ document.getElementById("analyze-image").addEventListener("click", async () => {
   try {
     const base64 = await fileToBase64(file);
     const schemaPrompt = `これはスマホゲーム「Royal Match」の「Merge Smith」というマージイベントの盤面スクリーンショットです。
-盤面上に置かれているアイテム（丸太・板・盾・兜・剣・鎧・マントなど）を種類ごとに数えてください。
+盤面上に置かれているアイテムを種類ごとに数えてください。名前は必ず次の一覧から見た目が一致するものを選び、一覧にない見た目のアイテムだけ自由に短い名前を付けてください:
+丸太, 板, 木の盾（丸くて木目調の盾）, 青の盾（青い宝石つきの盾）, 金の盾（金と青の紋章の盾）, 兜, シングルソード（剣1本）, クロスソード（剣2本が交差）, 弓矢, 鎧, マント
 同じ見た目のアイコンは同じ「段数」として扱い、より原始的な素材（丸太など）を段数0、そこから合成が進んだ見た目ほど段数を1,2,3...と上げてください（正確な段数が分からない場合は見た目の複雑さで推測してよいです）。
-上部の進行バー（Final Goal に向けた目標アイテム列）が見えれば、そこに並ぶ完成アイテム名を左から順に列挙してください。
+上部の進行バー（Final Goal に向けた目標アイテム列）が見えれば、そこに並ぶ完成アイテム名を左から順に列挙してください（同じく上記の名前一覧を使ってください）。
 以下のJSON形式のみで出力してください（説明文不要）:
 {"inventory":[{"name":"日本語の短い名前","tier":0,"count":1}],"goalItemNames":["名前1","名前2"]}`;
 
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${encodeURIComponent(apiKey)}`,
-      {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                { text: schemaPrompt },
-                { inline_data: { mime_type: file.type || "image/png", data: base64 } },
-              ],
-            },
-          ],
-        }),
-      }
-    );
+    const res = await fetch(GEMINI_PROXY_URL, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { text: schemaPrompt },
+              { inline_data: { mime_type: file.type || "image/png", data: base64 } },
+            ],
+          },
+        ],
+      }),
+    });
 
     if (!res.ok) {
       const errText = await res.text();
@@ -568,12 +560,12 @@ function loadState() {
 
 const DEFAULT_GOAL_ROWS = [
   { name: "板", icon: "icon-plank.png" },
-  { name: "丸盾", icon: "icon-woodshield.png" },
-  { name: "宝石の盾", icon: "icon-gemshield.png" },
-  { name: "紋章の盾", icon: "icon-shield.png" },
+  { name: "木の盾", icon: "icon-woodshield.png" },
+  { name: "青の盾", icon: "icon-gemshield.png" },
+  { name: "金の盾", icon: "icon-shield.png" },
   { name: "兜", icon: "icon-helmet.png" },
-  { name: "剣（1本）", icon: "icon-sword-single.png" },
-  { name: "剣", icon: "icon-sword.png" },
+  { name: "シングルソード", icon: "icon-sword-single.png" },
+  { name: "クロスソード", icon: "icon-sword.png" },
   { name: "弓矢", icon: "icon-bow.png" },
   { name: "鎧", icon: "icon-armor.png" },
   { name: "マント", icon: "icon-cape.png" },

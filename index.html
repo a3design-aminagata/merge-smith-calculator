@@ -31,7 +31,7 @@
   <div class="menu-divider"></div>
 
   <h2><img src="./icons/icon-shield.png" class="h2-icon" alt="" /> アイテム設定（丸太換算）</h2>
-  <p class="note">丸太から完成アイテムまでの合成チェーンに出てくるアイテムを、丸太に近い順から上に並べてください。丸太=1から始まり、1つ上に行くたびに2倍（2個マージで1個）になります（板=2、丸盾=4…）。並び順があやしければ <span class="row-drag-inline">⠿</span> を掴んでドラッグ（スマホなら指でスワイプ）して入れ替えてください。</p>
+  <p class="note">丸太から完成アイテムまでの合成チェーンに出てくるアイテムを、丸太に近い順から上に並べてください。丸太=1から始まり、1つ上に行くたびに2倍（2個マージで1個）になります（板=2、木の盾=4…）。並び順があやしければ <span class="row-drag-inline">⠿</span> を掴んでドラッグ（スマホなら指でスワイプ）して入れ替えてください。</p>
   <div class="table-wrap"><table class="goal-table" id="goal-table">
     <thead><tr><th></th><th>アイテム名</th><th>丸太換算<br><span class="th-note">(自動計算)</span></th></tr></thead>
     <tbody>
@@ -71,12 +71,7 @@
     <p class="note">盤面と同じマス。目標の候補をタップ選択。</p>
 
     <details class="ai-fill">
-      <summary>📷 スクショから自動入力する（要 Google Gemini APIキー・無料枠あり・試験機能）</summary>
-      <div class="row">
-        <label for="api-key">Gemini APIキー</label>
-        <input type="password" id="api-key" placeholder="AIzaSy..." />
-        <span class="hint">ブラウザのlocalStorageにのみ保存。どこにも送信しません。<a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener">Google AI Studio</a>で無料発行できます</span>
-      </div>
+      <summary>📷 スクショから自動入力する（試験機能）</summary>
       <div class="row">
         <input type="file" id="board-image" accept="image/*" />
         <button id="analyze-image" class="btn-add">画像を解析して自動入力</button>
