@@ -529,15 +529,14 @@ td.drag-cell {
 }
 
 .mini-result-table th:nth-child(1), .mini-result-table td:nth-child(1) {
-  width: 18%;
+  width: 12%;
 }
 
-.mini-result-table th:nth-child(2), .mini-result-table td:nth-child(2) {
-  width: 41%;
-}
-
-.mini-result-table th:nth-child(3), .mini-result-table td:nth-child(3) {
-  width: 41%;
+.mini-result-table th:nth-child(2), .mini-result-table td:nth-child(2),
+.mini-result-table th:nth-child(3), .mini-result-table td:nth-child(3),
+.mini-result-table th:nth-child(4), .mini-result-table td:nth-child(4),
+.mini-result-table th:nth-child(5), .mini-result-table td:nth-child(5) {
+  width: 22%;
 }
 
 .mini-result-table th:nth-child(1), .mini-result-table td:nth-child(1) {
@@ -546,11 +545,24 @@ td.drag-cell {
 }
 
 .mini-result-table th:nth-child(2), .mini-result-table td:nth-child(2) {
-  background: rgba(245, 166, 35, 0.12);
+  background: rgba(245, 166, 35, 0.13);
 }
 
 .mini-result-table th:nth-child(3), .mini-result-table td:nth-child(3) {
-  background: rgba(123, 201, 111, 0.14);
+  background: rgba(245, 166, 35, 0.26);
+}
+
+.mini-result-table th:nth-child(4), .mini-result-table td:nth-child(4) {
+  background: rgba(186, 148, 245, 0.13);
+}
+
+.mini-result-table th:nth-child(5), .mini-result-table td:nth-child(5) {
+  background: rgba(186, 148, 245, 0.26);
+}
+
+.mini-result-table th .row-icon {
+  vertical-align: middle;
+  margin-right: 2px;
 }
 
 .mini-result-table tbody tr:nth-child(even) td {

@@ -321,6 +321,19 @@ function boardHighestTier() {
   return max;
 }
 
+// 盤面の一番高いアイテムの次の段（＝次に完成させたいアイテム）の情報
+function nextItemInfo() {
+  const rows = [...goalBody.querySelectorAll("tr")];
+  const nextTier = boardHighestTier() + 1;
+  if (nextTier > rows.length) return null;
+  const tr = rows.find((t) => Number(t.dataset.tier) === nextTier);
+  if (!tr) return null;
+  const name = tr.querySelector(".goal-name").value.trim();
+  const iconImg = tr.querySelector(".name-cell img.row-icon");
+  const icon = iconImg ? iconImg.getAttribute("src").split("/").pop() : "";
+  return { name, icon, target: Math.pow(2, nextTier) };
+}
+
 function stageBonusTotal() {
   const highest = boardHighestTier();
   const applied = [];
@@ -381,10 +394,18 @@ document.getElementById("calc-btn").addEventListener("click", () => {
   const { total: bonusTotal, applied: appliedBonuses } = stageBonusTotal();
   const adjustedRemaining = Math.max(0, remaining - bonusTotal);
 
+  const nextInfo = nextItemInfo();
+  const nextRemaining = nextInfo === null ? null : Math.max(0, nextInfo.target - haveTotal);
+  const nextHeader = nextInfo
+    ? (nextInfo.icon ? `<img src="./icons/${nextInfo.icon}" class="row-icon" alt="${nextInfo.name}" />` : nextInfo.name) + "まで"
+    : "次アイテム";
+
   const perDigitRows = Array.from({ length: 10 }, (_, d) => {
     const normal = gamesNeededFrom(d, adjustedRemaining, false);
     const boosted = gamesNeededFrom(d, adjustedRemaining, true);
-    return `<tr><td>${d}</td><td>${normal}</td><td>${boosted}</td></tr>`;
+    const nextNormal = nextRemaining === null ? "-" : gamesNeededFrom(d, nextRemaining, false);
+    const nextBoosted = nextRemaining === null ? "-" : gamesNeededFrom(d, nextRemaining, true);
+    return `<tr><td>${d}</td><td>${normal}</td><td>${boosted}</td><td>${nextNormal}</td><td>${nextBoosted}</td></tr>`;
   }).join("");
 
   const invLines = Object.entries(invByName)
@@ -409,7 +430,7 @@ document.getElementById("calc-btn").addEventListener("click", () => {
       ${invLines ? `<div class="result-sep">盤面の内訳</div>${invLines}` : ""}
       <div class="result-sep">👑までのゲーム数</div>
       <table class="mini-result-table">
-        <thead><tr><th>一の位</th><th>通常</th><th>x2</th></tr></thead>
+        <thead><tr><th>一の位</th><th><img src="./icons/icon-crown.png" class="row-icon" alt="王冠" />まで</th><th>x2</th><th>${nextHeader}</th><th>x2</th></tr></thead>
         <tbody>${perDigitRows}</tbody>
       </table>
     </div>
