@@ -481,14 +481,51 @@ td.drag-cell {
 .mini-result-table {
   width: 100%;
   min-width: 0;
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .mini-result-table th, .mini-result-table td {
-  padding: 4px 2px;
+  padding: 5px 4px;
   font-size: 0.8rem;
+  border-bottom: none;
 }
 
 .mini-result-table td {
   color: var(--text);
   font-weight: 600;
+}
+
+.mini-result-table th:nth-child(1), .mini-result-table td:nth-child(1) {
+  width: 18%;
+}
+
+.mini-result-table th:nth-child(2), .mini-result-table td:nth-child(2) {
+  width: 41%;
+}
+
+.mini-result-table th:nth-child(3), .mini-result-table td:nth-child(3) {
+  width: 41%;
+}
+
+.mini-result-table th:nth-child(1), .mini-result-table td:nth-child(1) {
+  background: rgba(79, 195, 247, 0.12);
+  color: var(--accent2);
+}
+
+.mini-result-table th:nth-child(2), .mini-result-table td:nth-child(2) {
+  background: rgba(245, 166, 35, 0.12);
+}
+
+.mini-result-table th:nth-child(3), .mini-result-table td:nth-child(3) {
+  background: rgba(123, 201, 111, 0.14);
+}
+
+.mini-result-table tbody tr:nth-child(even) td {
+  box-shadow: inset 0 0 999px rgba(255, 255, 255, 0.06);
+}
+
+.mini-result-table tbody tr:nth-child(odd) td {
+  box-shadow: inset 0 0 999px rgba(0, 0, 0, 0.12);
 }

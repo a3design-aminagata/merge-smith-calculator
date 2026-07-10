@@ -3,7 +3,6 @@
 const DIGIT_DEFAULTS = { 0: 1, 1: 1, 2: 3, 3: 1, 4: 1, 5: 5, 6: 1, 7: 1, 8: 1, 9: 10 };
 
 const digitTable = document.getElementById("digit-table");
-const boostToggle = document.getElementById("boost-toggle");
 
 const goalBody = document.getElementById("goal-body");
 
@@ -46,8 +45,6 @@ function getDigitValue(d) {
   const inp = digitTable.querySelector(`input[data-digit="${d}"]`);
   return inp ? Number(inp.value) || 0 : 0;
 }
-
-boostToggle.addEventListener("change", saveState);
 
 // --- goal table ----------------------------------------------------------
 
@@ -290,7 +287,7 @@ document.getElementById("calc-btn").addEventListener("click", () => {
       <div><span>盤面の保有合計</span><span>丸太換算 ${haveTotal}</span></div>
       <div><span>不足</span><span>丸太換算 ${remaining}</span></div>
       ${invLines ? `<div class="result-sep">盤面の内訳</div>${invLines}` : ""}
-      <div class="result-sep">次のラウンド</div>
+      <div class="result-sep">👑までのゲーム数</div>
       <table class="mini-result-table">
         <thead><tr><th>一の位</th><th>通常</th><th>x2</th></tr></thead>
         <tbody>${perDigitRows}</tbody>
@@ -397,7 +394,6 @@ const STATE_STORAGE_KEY = "mergeSmithState";
 
 function saveState() {
   const state = {
-    boost: boostToggle.checked,
     digits: Object.fromEntries(
       [...digitTable.querySelectorAll("input[data-digit]")].map((inp) => [inp.dataset.digit, inp.value])
     ),
@@ -441,7 +437,6 @@ renderDigitTable();
 
 const savedState = loadState();
 if (savedState) {
-  boostToggle.checked = !!savedState.boost;
   if (savedState.digits) {
     Object.entries(savedState.digits).forEach(([d, v]) => {
       const inp = digitTable.querySelector(`input[data-digit="${d}"]`);
