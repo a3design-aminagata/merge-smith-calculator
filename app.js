@@ -75,6 +75,7 @@ function recomputeGoalTiers() {
     if (logsBadge) logsBadge.textContent = Math.pow(2, tier);
   });
   if (crownLogsBadge) crownLogsBadge.textContent = Math.pow(2, rows.length + 1);
+  renderStageBonusList();
 }
 
 // --- drag-to-reorder (mouse + touch) ---------------------------------------
@@ -292,6 +293,25 @@ const STAGE_BONUSES = [
   },
 ];
 
+const stageBonusListEl = document.getElementById("stage-bonus-list");
+
+function renderStageBonusList() {
+  if (!stageBonusListEl) return;
+  stageBonusListEl.innerHTML = STAGE_BONUSES.map((bonus) => {
+    const value = bonus.rewardItems.reduce(
+      (sum, item) => sum + item.count * Math.pow(2, tierForName(item.name)),
+      0
+    );
+    const itemsText = bonus.rewardItems.map((item) => `${item.name}×${item.count}`).join("、");
+    return `
+      <div class="bonus-row">
+        <div class="bonus-title"><span>${bonus.triggerName}到達</span><span class="goal-logs-badge">丸太換算 ${value}</span></div>
+        <div class="bonus-items">${itemsText}</div>
+      </div>
+    `;
+  }).join("");
+}
+
 function boardHighestTier() {
   let max = 0;
   boardCells.forEach((name) => {
@@ -315,6 +335,14 @@ function stageBonusTotal() {
     applied.push({ name: bonus.triggerName, value });
   });
   return { total, applied };
+}
+
+// STAGE_BONUSESは剣（1本）以降しか登録していないので、盤面の最高段がそれより
+// 下(丸太〜兜)の場合はまだ不足の見積もりが少し多めに出る
+function missingBonusDataWarning() {
+  const lowestTrigger = Math.min(...STAGE_BONUSES.map((b) => tierForName(b.triggerName)));
+  if (boardHighestTier() >= lowestTrigger) return "";
+  return "⚠️ 盤面の一番高いアイテムが剣（1本）未満（丸太〜兜）のため、その段階の確定ボーナスがまだ未登録で、下の不足はやや多めに出ています。そのステージで最初から盤面に出ていたアイテムを教えてもらえれば追加できます。";
 }
 
 function rewardForDigit(d, boosted) {
@@ -367,9 +395,12 @@ document.getElementById("calc-btn").addEventListener("click", () => {
     .map((b) => `<div><span class="name">${b.name}ボーナス</span><span>-${b.value}</span></div>`)
     .join("");
 
+  const warning = missingBonusDataWarning();
+
   const resultEl = document.getElementById("result");
   resultEl.innerHTML = `
     <div class="result-breakdown">
+      ${warning ? `<p class="note warn">${warning}</p>` : ""}
       <div><span>目標合計</span><span>丸太換算 ${target}</span></div>
       <div><span>盤面の保有合計</span><span>丸太換算 ${haveTotal}</span></div>
       <div><span>不足</span><span>丸太換算 ${remaining}</span></div>

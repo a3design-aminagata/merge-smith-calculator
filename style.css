@@ -268,6 +268,37 @@ td.drag-cell {
   font-weight: 600;
 }
 
+.bonus-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bonus-row {
+  background: #17102a;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+}
+
+.bonus-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.bonus-title .goal-logs-badge {
+  font-size: 0.85rem;
+}
+
+.bonus-items {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  margin-top: 4px;
+}
+
 /* --- board grid (section③) --- */
 
 .board-grid {
