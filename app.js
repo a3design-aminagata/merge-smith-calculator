@@ -239,20 +239,20 @@ function goalTarget() {
   return Math.pow(2, goalBody.querySelectorAll("tr").length + 1);
 }
 
-function rewardForDigit(d) {
+function rewardForDigit(d, boosted) {
   const base = getDigitValue(d);
-  return Math.max(1, boostToggle.checked ? base * 2 : base);
+  return Math.max(1, boosted ? base * 2 : base);
 }
 
 // 一の位はステージを1つクリアするごとに0→1→2→...→9→0と巡回するので、
 // 開始する一の位から順に報酬を足していき、不足分に届くまでのゲーム数を数える
-function gamesNeededFrom(startDigit, remaining) {
+function gamesNeededFrom(startDigit, remaining, boosted) {
   if (remaining <= 0) return 0;
   let total = 0;
   let games = 0;
   let d = startDigit;
   while (total < remaining) {
-    total += rewardForDigit(d);
+    total += rewardForDigit(d, boosted);
     games++;
     d = (d + 1) % 10;
   }
@@ -273,8 +273,11 @@ document.getElementById("calc-btn").addEventListener("click", () => {
 
   const remaining = Math.max(0, target - haveTotal);
 
-  const perDigitCells = Array.from({ length: 10 }, (_, d) => `<td>${gamesNeededFrom(d, remaining)}</td>`).join("");
-  const digitHeaderCells = Array.from({ length: 10 }, (_, d) => `<th>${d}</th>`).join("");
+  const perDigitRows = Array.from({ length: 10 }, (_, d) => {
+    const normal = gamesNeededFrom(d, remaining, false);
+    const boosted = gamesNeededFrom(d, remaining, true);
+    return `<tr><td>${d}</td><td>${normal}</td><td>${boosted}</td></tr>`;
+  }).join("");
 
   const invLines = Object.entries(invByName)
     .map(([name, value]) => `<div><span class="name">${name}</span><span>丸太換算 ${value}</span></div>`)
@@ -288,10 +291,10 @@ document.getElementById("calc-btn").addEventListener("click", () => {
       <div><span>不足</span><span>丸太換算 ${remaining}</span></div>
       ${invLines ? `<div class="result-sep">盤面の内訳</div>${invLines}` : ""}
       <div class="result-sep">次のラウンド</div>
-      <div class="table-wrap"><table class="mini-result-table">
-        <thead><tr>${digitHeaderCells}</tr></thead>
-        <tbody><tr>${perDigitCells}</tr></tbody>
-      </table></div>
+      <table class="mini-result-table">
+        <thead><tr><th>一の位</th><th>通常</th><th>x2</th></tr></thead>
+        <tbody>${perDigitRows}</tbody>
+      </table>
     </div>
   `;
 });
