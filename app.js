@@ -334,30 +334,6 @@ function nextItemInfo() {
   return { name, icon, target: Math.pow(2, nextTier) };
 }
 
-function stageBonusTotal() {
-  const highest = boardHighestTier();
-  const applied = [];
-  let total = 0;
-  STAGE_BONUSES.forEach((bonus) => {
-    if (tierForName(bonus.triggerName) > highest) return;
-    const value = bonus.rewardItems.reduce(
-      (sum, item) => sum + item.count * Math.pow(2, tierForName(item.name)),
-      0
-    );
-    total += value;
-    applied.push({ name: bonus.triggerName, value });
-  });
-  return { total, applied };
-}
-
-// STAGE_BONUSESは剣（1本）以降しか登録していないので、盤面の最高段がそれより
-// 下(丸太〜兜)の場合はまだ不足の見積もりが少し多めに出る
-function missingBonusDataWarning() {
-  const lowestTrigger = Math.min(...STAGE_BONUSES.map((b) => tierForName(b.triggerName)));
-  if (boardHighestTier() >= lowestTrigger) return "";
-  return "⚠️ 盤面の一番高いアイテムが剣（1本）未満（丸太〜兜）のため、その段階の確定ボーナスがまだ未登録で、下の不足はやや多めに出ています。";
-}
-
 function rewardForDigit(d, boosted) {
   const base = getDigitValue(d);
   return Math.max(1, boosted ? base * 2 : base);
@@ -391,8 +367,6 @@ document.getElementById("calc-btn").addEventListener("click", () => {
   });
 
   const remaining = Math.max(0, target - haveTotal);
-  const { total: bonusTotal, applied: appliedBonuses } = stageBonusTotal();
-  const adjustedRemaining = Math.max(0, remaining - bonusTotal);
 
   const nextInfo = nextItemInfo();
   const nextRemaining = nextInfo === null ? null : Math.max(0, nextInfo.target - haveTotal);
@@ -401,8 +375,8 @@ document.getElementById("calc-btn").addEventListener("click", () => {
     : "次アイテム";
 
   const perDigitRows = Array.from({ length: 10 }, (_, d) => {
-    const normal = gamesNeededFrom(d, adjustedRemaining, false);
-    const boosted = gamesNeededFrom(d, adjustedRemaining, true);
+    const normal = gamesNeededFrom(d, remaining, false);
+    const boosted = gamesNeededFrom(d, remaining, true);
     const nextNormal = nextRemaining === null ? "-" : gamesNeededFrom(d, nextRemaining, false);
     const nextBoosted = nextRemaining === null ? "-" : gamesNeededFrom(d, nextRemaining, true);
     return `<tr><td>${d}</td><td>${normal}</td><td>${boosted}</td><td>${nextNormal}</td><td>${nextBoosted}</td></tr>`;
@@ -412,21 +386,12 @@ document.getElementById("calc-btn").addEventListener("click", () => {
     .map(([name, value]) => `<div><span class="name">${name}</span><span>丸太換算 ${value}</span></div>`)
     .join("");
 
-  const bonusLines = appliedBonuses
-    .map((b) => `<div><span class="name">${b.name}ボーナス</span><span>-${b.value}</span></div>`)
-    .join("");
-
-  const warning = missingBonusDataWarning();
-
   const resultEl = document.getElementById("result");
   resultEl.innerHTML = `
     <div class="result-breakdown">
-      ${warning ? `<p class="note warn">${warning}</p>` : ""}
       <div><span>目標合計</span><span>丸太換算 ${target}</span></div>
       <div><span>盤面の保有合計</span><span>丸太換算 ${haveTotal}</span></div>
       <div><span>不足</span><span>丸太換算 ${remaining}</span></div>
-      ${bonusLines}
-      ${bonusTotal > 0 ? `<div><span>不足（ボーナス反映後）</span><span>丸太換算 ${adjustedRemaining}</span></div>` : ""}
       ${invLines ? `<div class="result-sep">盤面の内訳</div>${invLines}` : ""}
       <div class="result-sep">👑までのゲーム数</div>
       <table class="mini-result-table">
