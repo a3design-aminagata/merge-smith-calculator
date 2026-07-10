@@ -321,26 +321,23 @@ function boardHighestTier() {
   return max;
 }
 
-// 盤面の一番高いアイテムから見て、まだ受け取っていない直近1段先の
-// 到達ボーナス（自動でもらえる分）。既に通過した段のボーナスは
-// 盤面の状態に織り込み済みなので対象外、まだ先の段の分だけを見積もる。
-function nextStageBonus() {
+// 盤面の一番高いアイテムから見て、まだ通過していない段の到達ボーナスは
+// 全部これから確定でもらえる分。既に通過済みの段のボーナスは盤面の状態に
+// 織り込み済みなので対象外、まだ先の段の分は全部合算して見積もる。
+function pendingStageBonusTotal() {
   const highest = boardHighestTier();
-  let best = null;
-  let bestTier = Infinity;
+  const applied = [];
+  let total = 0;
   STAGE_BONUSES.forEach((bonus) => {
-    const t = tierForName(bonus.triggerName);
-    if (t > highest && t < bestTier) {
-      best = bonus;
-      bestTier = t;
-    }
+    if (tierForName(bonus.triggerName) <= highest) return;
+    const value = bonus.rewardItems.reduce(
+      (sum, item) => sum + item.count * Math.pow(2, tierForName(item.name)),
+      0
+    );
+    total += value;
+    applied.push({ name: bonus.triggerName, value });
   });
-  if (!best) return null;
-  const value = best.rewardItems.reduce(
-    (sum, item) => sum + item.count * Math.pow(2, tierForName(item.name)),
-    0
-  );
-  return { name: best.triggerName, value };
+  return { total, applied };
 }
 
 // 盤面の一番高いアイテムの次の段（＝次に完成させたいアイテム）の情報
@@ -389,16 +386,12 @@ document.getElementById("calc-btn").addEventListener("click", () => {
   });
 
   const remaining = Math.max(0, target - haveTotal);
-  const bonus = nextStageBonus();
-  const adjustedRemaining = bonus ? Math.max(0, remaining - bonus.value) : remaining;
+  const { total: bonusTotal, applied: appliedBonuses } = pendingStageBonusTotal();
+  const adjustedRemaining = Math.max(0, remaining - bonusTotal);
 
   const nextInfo = nextItemInfo();
   const nextRemainingRaw = nextInfo === null ? null : Math.max(0, nextInfo.target - haveTotal);
-  const nextRemaining = nextRemainingRaw === null
-    ? null
-    : bonus
-    ? Math.max(0, nextRemainingRaw - bonus.value)
-    : nextRemainingRaw;
+  const nextRemaining = nextRemainingRaw === null ? null : Math.max(0, nextRemainingRaw - bonusTotal);
   const nextHeader = nextInfo
     ? (nextInfo.icon ? `<img src="./icons/${nextInfo.icon}" class="row-icon" alt="${nextInfo.name}" />` : nextInfo.name) + "まで"
     : "次アイテム";
@@ -415,9 +408,11 @@ document.getElementById("calc-btn").addEventListener("click", () => {
     .map(([name, value]) => `<div><span class="name">${name}</span><span>丸太換算 ${value}</span></div>`)
     .join("");
 
-  const bonusLine = bonus
-    ? `<div><span>${bonus.name}ボーナス（次のステージで確定）</span><span>-${bonus.value}</span></div>
-       <div><span>不足（ボーナス反映後）</span><span>丸太換算 ${adjustedRemaining}</span></div>`
+  const bonusLines = appliedBonuses
+    .map((b) => `<div><span class="name">${b.name}ボーナス（未到達分）</span><span>-${b.value}</span></div>`)
+    .join("");
+  const bonusLine = bonusTotal > 0
+    ? `${bonusLines}<div><span>不足（ボーナス反映後）</span><span>丸太換算 ${adjustedRemaining}</span></div>`
     : "";
 
   const resultEl = document.getElementById("result");
