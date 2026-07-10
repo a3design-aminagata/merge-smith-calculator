@@ -247,6 +247,15 @@ const STAGE_BONUSES = [
       { name: "兜", count: 1 },
     ],
   },
+  {
+    triggerName: "剣（1本）",
+    rewardItems: [
+      { name: "丸太", count: 12 },
+      { name: "板", count: 5 },
+      { name: "剣", count: 1 },
+      { name: "宝石の盾", count: 1 },
+    ],
+  },
 ];
 
 function boardHighestTier() {
