@@ -353,6 +353,14 @@ function nextItemInfo() {
   return { name, icon, target: Math.pow(2, nextTier) };
 }
 
+// STAGE_BONUSESは剣（1本）到達時点からしか登録していない。兜到達時点の
+// ボーナスはまだ未登録なので、盤面の一番高いアイテムが兜未満（紋章の盾以下）
+// だと、pendingStageBonusTotalがその分を拾えずゲーム数がやや多めに出る
+function missingBonusDataWarning() {
+  if (boardHighestTier() >= tierForName("兜")) return "";
+  return "⚠️ 兜ステージ以下の確定ボーナスがまだ未登録なので、下のゲーム数はやや多めに出ています。";
+}
+
 function rewardForDigit(d, boosted) {
   const base = getDigitValue(d);
   return Math.max(1, boosted ? base * 2 : base);
@@ -414,9 +422,12 @@ document.getElementById("calc-btn").addEventListener("click", () => {
     ? `${bonusLines}<div><span>不足（ボーナス反映後）</span><span>丸太換算 ${adjustedRemaining}</span></div>`
     : "";
 
+  const warning = missingBonusDataWarning();
+
   const resultEl = document.getElementById("result");
   resultEl.innerHTML = `
     <div class="result-breakdown">
+      ${warning ? `<p class="note warn">${warning}</p>` : ""}
       <div><span>目標合計</span><span>丸太換算 ${target}</span></div>
       <div><span>盤面の保有合計</span><span>丸太換算 ${haveTotal}</span></div>
       <div><span>不足</span><span>丸太換算 ${remaining}</span></div>
