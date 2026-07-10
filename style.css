@@ -498,15 +498,14 @@ td.drag-cell {
 }
 
 .mini-result-table th:nth-child(1), .mini-result-table td:nth-child(1) {
-  width: 18%;
+  width: 12%;
 }
 
-.mini-result-table th:nth-child(2), .mini-result-table td:nth-child(2) {
-  width: 41%;
-}
-
-.mini-result-table th:nth-child(3), .mini-result-table td:nth-child(3) {
-  width: 41%;
+.mini-result-table th:nth-child(2), .mini-result-table td:nth-child(2),
+.mini-result-table th:nth-child(3), .mini-result-table td:nth-child(3),
+.mini-result-table th:nth-child(4), .mini-result-table td:nth-child(4),
+.mini-result-table th:nth-child(5), .mini-result-table td:nth-child(5) {
+  width: 22%;
 }
 
 .mini-result-table th:nth-child(1), .mini-result-table td:nth-child(1) {
@@ -520,6 +519,14 @@ td.drag-cell {
 
 .mini-result-table th:nth-child(3), .mini-result-table td:nth-child(3) {
   background: rgba(123, 201, 111, 0.14);
+}
+
+.mini-result-table th:nth-child(4), .mini-result-table td:nth-child(4) {
+  background: rgba(186, 148, 245, 0.14);
+}
+
+.mini-result-table th:nth-child(5), .mini-result-table td:nth-child(5) {
+  background: rgba(240, 128, 176, 0.14);
 }
 
 .mini-result-table tbody tr:nth-child(even) td {

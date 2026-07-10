@@ -301,6 +301,14 @@ function boardHighestTier() {
   return max;
 }
 
+// 盤面の一番高いアイテムの次の段（＝次に完成させたいアイテム）までの丸太換算値
+function nextItemTarget() {
+  const totalTiers = goalBody.querySelectorAll("tr").length;
+  const nextTier = boardHighestTier() + 1;
+  if (nextTier > totalTiers) return null;
+  return Math.pow(2, nextTier);
+}
+
 function stageBonusTotal() {
   const highest = boardHighestTier();
   const applied = [];
@@ -353,10 +361,15 @@ document.getElementById("calc-btn").addEventListener("click", () => {
   const { total: bonusTotal, applied: appliedBonuses } = stageBonusTotal();
   const adjustedRemaining = Math.max(0, remaining - bonusTotal);
 
+  const nextTarget = nextItemTarget();
+  const nextRemaining = nextTarget === null ? null : Math.max(0, nextTarget - haveTotal);
+
   const perDigitRows = Array.from({ length: 10 }, (_, d) => {
     const normal = gamesNeededFrom(d, adjustedRemaining, false);
     const boosted = gamesNeededFrom(d, adjustedRemaining, true);
-    return `<tr><td>${d}</td><td>${normal}</td><td>${boosted}</td></tr>`;
+    const nextNormal = nextRemaining === null ? "-" : gamesNeededFrom(d, nextRemaining, false);
+    const nextBoosted = nextRemaining === null ? "-" : gamesNeededFrom(d, nextRemaining, true);
+    return `<tr><td>${d}</td><td>${normal}</td><td>${boosted}</td><td>${nextNormal}</td><td>${nextBoosted}</td></tr>`;
   }).join("");
 
   const invLines = Object.entries(invByName)
@@ -378,7 +391,7 @@ document.getElementById("calc-btn").addEventListener("click", () => {
       ${invLines ? `<div class="result-sep">盤面の内訳</div>${invLines}` : ""}
       <div class="result-sep">👑までのゲーム数</div>
       <table class="mini-result-table">
-        <thead><tr><th>一の位</th><th>通常</th><th>x2</th></tr></thead>
+        <thead><tr><th>一の位</th><th>通常</th><th>x2</th><th>次アイテム(通常)</th><th>次アイテム(x2)</th></tr></thead>
         <tbody>${perDigitRows}</tbody>
       </table>
     </div>
