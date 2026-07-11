@@ -462,6 +462,10 @@ td.drag-cell {
   color: var(--accent2);
 }
 
+.ai-fill .row {
+  margin-top: 10px;
+}
+
 .result-card {
   border-color: var(--accent);
 }
