@@ -83,7 +83,7 @@ function recomputeGoalTiers() {
 // ざっと何ゲームかかるかの目安。一の位がどこから始まるかで変わるので、
 // 0〜9の全開始位置で計算してその最小〜最大を範囲として出す。
 function gamesRangeText(target) {
-  if (target <= 0) return "-";
+  if (target <= 0) return "0ゲーム";
   let min = Infinity;
   let max = -Infinity;
   for (let d = 0; d <= 9; d++) {
@@ -94,18 +94,37 @@ function gamesRangeText(target) {
   return min === max ? `${min}ゲーム` : `${min}〜${max}ゲーム`;
 }
 
+// このtierに到達するまでに必ず通過している到達ボーナス(トリガーのtierが
+// これより小さいもの)は、そこまでの過程で確定でもらえている前提で
+// 丸太換算から差し引く。トリガーtier以上の分はまだ未通過なので含めない。
+function stageBonusValueBelowTier(tier) {
+  let total = 0;
+  STAGE_BONUSES.forEach((bonus) => {
+    if (tierForName(bonus.triggerName) >= tier) return;
+    total += bonus.rewardItems.reduce(
+      (sum, item) => sum + item.count * Math.pow(2, tierForName(item.name)),
+      0
+    );
+  });
+  return total;
+}
+
+function adjustedGoalTarget(tier) {
+  return Math.max(0, Math.pow(2, tier) - stageBonusValueBelowTier(tier));
+}
+
 function renderGoalGamesEstimates() {
   const logBadge = document.getElementById("log-games-badge");
-  if (logBadge) logBadge.textContent = gamesRangeText(1);
+  if (logBadge) logBadge.textContent = gamesRangeText(adjustedGoalTarget(0));
 
   const rows = [...goalBody.querySelectorAll("tr")];
   rows.forEach((tr) => {
     const badge = tr.querySelector(".goal-games-badge");
-    if (badge) badge.textContent = gamesRangeText(Math.pow(2, Number(tr.dataset.tier) || 0));
+    if (badge) badge.textContent = gamesRangeText(adjustedGoalTarget(Number(tr.dataset.tier) || 0));
   });
 
   const crownGamesBadge = document.getElementById("crown-games-badge");
-  if (crownGamesBadge) crownGamesBadge.textContent = gamesRangeText(Math.pow(2, rows.length + 1));
+  if (crownGamesBadge) crownGamesBadge.textContent = gamesRangeText(adjustedGoalTarget(rows.length + 1));
 }
 
 // --- drag-to-reorder (mouse + touch) ---------------------------------------
