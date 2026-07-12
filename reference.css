@@ -68,6 +68,31 @@
   border: 1px solid var(--border);
 }
 
+.anvil-bonus-items {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.anvil-bonus-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+}
+
+.anvil-bonus-item .ref-icon {
+  width: 26px;
+  height: 26px;
+}
+
+.anvil-bonus-count {
+  margin-left: auto;
+  color: var(--accent2);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 .bonus-card a:hover img {
   border-color: var(--accent2);
 }
