@@ -262,6 +262,14 @@ td.drag-cell {
   font-size: 0.95rem;
 }
 
+.goal-games-badge {
+  display: inline-block;
+  min-width: 4.2em;
+  color: var(--text-dim);
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
 .goal-fixed-row {
   opacity: 0.75;
 }

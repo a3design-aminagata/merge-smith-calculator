@@ -23,7 +23,7 @@ function renderDigitTable() {
     inp.dataset.digit = String(d);
     inp.value = DIGIT_DEFAULTS[d];
     inp.disabled = true;
-    inp.addEventListener("input", saveState);
+    inp.addEventListener("input", () => { renderGoalGamesEstimates(); saveState(); });
     td.appendChild(inp);
     valRow.appendChild(td);
   }
@@ -57,6 +57,7 @@ function addGoalRow(name = "", icon = "") {
     <td class="drag-cell"><span class="row-drag" title="ドラッグして並び替え">⠿</span></td>
     <td class="name-cell">${iconHtml}<input type="text" class="goal-name" value="${name}" placeholder="例: 剣" /></td>
     <td><span class="goal-logs-badge">-</span></td>
+    <td><span class="goal-games-badge">-</span></td>
   `;
   tr.querySelector(".goal-name").addEventListener("input", saveState);
   enableRowDrag(tr, tr.querySelector(".row-drag"));
@@ -76,6 +77,35 @@ function recomputeGoalTiers() {
   });
   if (crownLogsBadge) crownLogsBadge.textContent = Math.pow(2, rows.length + 1);
   renderStageBonusList();
+  renderGoalGamesEstimates();
+}
+
+// ざっと何ゲームかかるかの目安。一の位がどこから始まるかで変わるので、
+// 0〜9の全開始位置で計算してその最小〜最大を範囲として出す。
+function gamesRangeText(target) {
+  if (target <= 0) return "-";
+  let min = Infinity;
+  let max = -Infinity;
+  for (let d = 0; d <= 9; d++) {
+    const games = gamesNeededFrom(d, target, false);
+    if (games < min) min = games;
+    if (games > max) max = games;
+  }
+  return min === max ? `${min}ゲーム` : `${min}〜${max}ゲーム`;
+}
+
+function renderGoalGamesEstimates() {
+  const logBadge = document.getElementById("log-games-badge");
+  if (logBadge) logBadge.textContent = gamesRangeText(1);
+
+  const rows = [...goalBody.querySelectorAll("tr")];
+  rows.forEach((tr) => {
+    const badge = tr.querySelector(".goal-games-badge");
+    if (badge) badge.textContent = gamesRangeText(Math.pow(2, Number(tr.dataset.tier) || 0));
+  });
+
+  const crownGamesBadge = document.getElementById("crown-games-badge");
+  if (crownGamesBadge) crownGamesBadge.textContent = gamesRangeText(Math.pow(2, rows.length + 1));
 }
 
 // --- drag-to-reorder (mouse + touch) ---------------------------------------
