@@ -194,6 +194,9 @@ function getBoardItemOptions() {
 
 function tierForName(name) {
   if (name === "丸太") return 0;
+  // Anvil Pass(Freeトラック)の👑報酬は丸太換算とは別の数え方なので、
+  // 換算せずそのまま加算されるようtier0(=そのままの数)として扱う。
+  if (name === "Anvilパス👑") return 0;
   const tr = [...goalBody.querySelectorAll("tr")].find(
     (t) => t.querySelector(".goal-name").value.trim() === name
   );
@@ -288,13 +291,34 @@ function goalTarget() {
 
 // 盤面の一番高いアイテムが一定の段まで到達すると、次の段のステージ開始時に
 // 無料でもらえるアイテムがある。到達済みのものを全部足して不足から引く。
+// Anvil Pass(Freeトラック)側の👑ボーナスも同じ仕組みでrewardItemsに
+// 「Anvilパス👑」として加算している(参考: reference-screenshots/anvilpass-*.png)。
 const STAGE_BONUSES = [
+  {
+    triggerName: "青の盾",
+    rewardItems: [
+      { name: "Anvilパス👑", count: 1 },
+    ],
+  },
+  {
+    triggerName: "金の盾",
+    rewardItems: [
+      { name: "Anvilパス👑", count: 1 },
+    ],
+  },
+  {
+    triggerName: "兜",
+    rewardItems: [
+      { name: "Anvilパス👑", count: 1 },
+    ],
+  },
   {
     triggerName: "シングルソード",
     rewardItems: [
       { name: "丸太", count: 12 },
       { name: "板", count: 4 },
       { name: "兜", count: 1 },
+      { name: "Anvilパス👑", count: 1 },
     ],
   },
   {
@@ -304,6 +328,7 @@ const STAGE_BONUSES = [
       { name: "板", count: 5 },
       { name: "シングルソード", count: 1 },
       { name: "青の盾", count: 1 },
+      { name: "Anvilパス👑", count: 2 },
     ],
   },
   {
@@ -315,6 +340,7 @@ const STAGE_BONUSES = [
       { name: "青の盾", count: 2 },
       { name: "兜", count: 1 },
       { name: "金の盾", count: 1 },
+      { name: "Anvilパス👑", count: 2 },
     ],
   },
   {
@@ -325,6 +351,7 @@ const STAGE_BONUSES = [
       { name: "丸太", count: 5 },
       { name: "兜", count: 4 },
       { name: "クロスソード", count: 2 },
+      { name: "Anvilパス👑", count: 2 },
     ],
   },
   {
@@ -338,6 +365,7 @@ const STAGE_BONUSES = [
       { name: "シングルソード", count: 2 },
       { name: "弓矢", count: 1 },
       { name: "金の盾", count: 1 },
+      { name: "Anvilパス👑", count: 5 },
     ],
   },
 ];
@@ -402,12 +430,12 @@ function nextItemInfo() {
   return { name, icon, target: Math.pow(2, nextTier) };
 }
 
-// STAGE_BONUSESはシングルソード到達時点からしか登録していない。兜到達時点の
-// ボーナスはまだ未登録なので、盤面の一番高いアイテムが兜未満（金の盾以下）
+// STAGE_BONUSESは青の盾到達時点からしか登録していない。板・木の盾到達時点の
+// ボーナスはまだ未登録なので、盤面の一番高いアイテムが青の盾未満（木の盾以下）
 // だと、pendingStageBonusTotalがその分を拾えずゲーム数がやや多めに出る
 function missingBonusDataWarning() {
-  if (boardHighestTier() >= tierForName("兜")) return "";
-  return "⚠️ 兜ステージ以下の確定ボーナスがまだ未登録なので、下のゲーム数はやや多めに出ています。";
+  if (boardHighestTier() >= tierForName("青の盾")) return "";
+  return "⚠️ 板・木の盾ステージ時点の確定ボーナスがまだ未登録なので、下のゲーム数はやや多めに出ています。";
 }
 
 function rewardForDigit(d, boosted) {
