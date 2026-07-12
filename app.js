@@ -168,6 +168,24 @@ function currentGoalNames() {
     .filter((v) => v.length > 0);
 }
 
+// AIが返す名前が既存アイテムと表記ゆれ(括弧の説明を含めてしまう・全角半角違いなど)
+// になることがあるため、既存名に正規化一致するものがあればそちらを優先して使う。
+// これをやらないと、見た目は同じ名前なのにアイコンなしの重複行ができてしまう。
+function normalizeItemName(name) {
+  return name
+    .normalize("NFKC")
+    .replace(/[（(][^）)]*[）)]/g, "")
+    .trim();
+}
+
+function resolveGoalName(rawName) {
+  const raw = (rawName || "").trim();
+  const norm = normalizeItemName(raw);
+  const candidates = ["丸太", ...currentGoalNames()];
+  const match = candidates.find((n) => normalizeItemName(n) === norm);
+  return match || raw;
+}
+
 const BOARD_ROWS = 6;
 const BOARD_COLS = 6;
 let boardCells = new Array(BOARD_ROWS * BOARD_COLS).fill(null);
@@ -535,8 +553,9 @@ document.getElementById("analyze-image").addEventListener("click", async () => {
   try {
     const base64 = await fileToBase64(file);
     const schemaPrompt = `これはスマホゲーム「Royal Match」の「Merge Smith」というマージイベントの盤面スクリーンショットです。
-盤面上に置かれているアイテムを種類ごとに数えてください。名前は必ず次の一覧から見た目が一致するものを選び、一覧にない見た目のアイテムだけ自由に短い名前を付けてください:
-丸太, 板, 木の盾（丸くて木目調の盾）, 青の盾（青い宝石つきの盾）, 金の盾（金と青の紋章の盾）, 兜, シングルソード（剣1本）, クロスソード（剣2本が交差）, 弓矢, 鎧, マント
+盤面上に置かれているアイテムを種類ごとに数えてください。名前は必ず次の一覧の単語をそのまま(括弧の中身は含めず)使い、一覧にない見た目のアイテムだけ自由に短い名前を付けてください:
+丸太 / 板 / 木の盾 (丸くて木目調の盾) / 青の盾 (青い宝石つきの盾) / 金の盾 (金と青の紋章の盾) / 兜 / シングルソード (剣1本) / クロスソード (剣2本が交差) / 弓矢 / 鎧 / マント
+括弧内は見分け方の参考説明であり、出力するnameには括弧もその中身も絶対に含めないでください（例: 正「木の盾」／誤「木の盾(丸くて木目調の盾)」）。
 同じ見た目のアイコンは同じ「段数」として扱い、より原始的な素材（丸太など）を段数0、そこから合成が進んだ見た目ほど段数を1,2,3...と上げてください（正確な段数が分からない場合は見た目の複雑さで推測してよいです）。
 上部の進行バー（Final Goal に向けた目標アイテム列）が見えれば、そこに並ぶ完成アイテム名を左から順に列挙してください（同じく上記の名前一覧を使ってください）。
 以下のJSON形式のみで出力してください（説明文不要）:
@@ -569,17 +588,19 @@ document.getElementById("analyze-image").addEventListener("click", async () => {
     const parsed = JSON.parse(jsonMatch[0]);
 
     (parsed.goalItemNames || []).forEach((name) => {
-      if (!currentGoalNames().includes(name)) addGoalRow(name);
+      const resolved = resolveGoalName(name);
+      if (!currentGoalNames().includes(resolved)) addGoalRow(resolved);
     });
 
     let placed = 0;
     let skipped = 0;
     (parsed.inventory || []).forEach((item) => {
+      const resolvedName = resolveGoalName(item.name);
       const count = item.count ?? 1;
       for (let i = 0; i < count; i++) {
         const emptyIdx = boardCells.findIndex((v) => v === null);
         if (emptyIdx === -1) { skipped++; continue; }
-        boardCells[emptyIdx] = item.name;
+        boardCells[emptyIdx] = resolvedName;
         placed++;
       }
     });
