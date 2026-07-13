@@ -627,9 +627,14 @@ function fileToBase64(file) {
 // --- persistence (remembers your inputs across reloads) ---------------------
 
 const STATE_STORAGE_KEY = "mergeSmithState";
+// DEFAULT_GOAL_ROWSの内容(名前・行数)を変更したら、この番号を上げる。
+// 保存済みstateのバージョンが古い場合、goalRowsを最新のデフォルトで上書きし、
+// 古い名前やアイテム構成がキャッシュとして残り続けるのを防ぐ。
+const GOAL_ROWS_VERSION = 2;
 
 function saveState() {
   const state = {
+    goalRowsVersion: GOAL_ROWS_VERSION,
     digits: Object.fromEntries(
       [...digitTable.querySelectorAll("input[data-digit]")].map((inp) => [inp.dataset.digit, inp.value])
     ),
@@ -679,7 +684,8 @@ if (savedState) {
       if (inp) inp.value = v;
     });
   }
-  const rows = savedState.goalRows && savedState.goalRows.length ? savedState.goalRows : DEFAULT_GOAL_ROWS;
+  const goalRowsStale = savedState.goalRowsVersion !== GOAL_ROWS_VERSION;
+  const rows = !goalRowsStale && savedState.goalRows && savedState.goalRows.length ? savedState.goalRows : DEFAULT_GOAL_ROWS;
   rows.forEach((r) => addGoalRow(r.name, r.icon));
   if (Array.isArray(savedState.boardCells) && savedState.boardCells.length === BOARD_ROWS * BOARD_COLS) {
     boardCells = savedState.boardCells;
