@@ -7,6 +7,8 @@
   --text-dim: #b3a8cc;
   --border: #3d2f5c;
   --danger: #e85d5d;
+  --info-blue: #0184ca;
+  --info-blue-hover: #1f9de0;
 }
 
 * { box-sizing: border-box; }
@@ -459,9 +461,9 @@ td.drag-cell {
 }
 
 .btn-solid {
-  background: var(--accent2);
-  border: 1px solid var(--accent2);
-  color: #0a1f2b;
+  background: var(--info-blue);
+  border: 1px solid var(--info-blue);
+  color: #fff;
   font-weight: 700;
   border-radius: 8px;
   padding: 6px 14px;
@@ -470,8 +472,15 @@ td.drag-cell {
 }
 
 .btn-solid:hover {
-  background: #7cd8ff;
-  border-color: #7cd8ff;
+  background: var(--info-blue-hover);
+  border-color: var(--info-blue-hover);
+}
+
+.btn-solid:disabled {
+  background: none;
+  border: 1px dashed var(--border);
+  color: var(--text-dim);
+  cursor: not-allowed;
 }
 
 .visually-hidden-file {
@@ -487,9 +496,9 @@ td.drag-cell {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  background: var(--accent2);
-  border: 1px solid var(--accent2);
-  color: #0a1f2b;
+  background: var(--info-blue);
+  border: 1px solid var(--info-blue);
+  color: #fff;
   font-weight: 700;
   border-radius: 8px;
   padding: 6px 14px;
@@ -498,14 +507,14 @@ td.drag-cell {
 }
 
 .file-picker:hover {
-  background: #7cd8ff;
-  border-color: #7cd8ff;
+  background: var(--info-blue-hover);
+  border-color: var(--info-blue-hover);
 }
 
 .file-picker-name {
   font-weight: 400;
-  color: #0a1f2b;
-  background: rgba(10, 31, 43, 0.12);
+  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 6px;
   padding: 2px 8px;
   max-width: 180px;

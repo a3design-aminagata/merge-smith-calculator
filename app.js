@@ -544,6 +544,7 @@ const GEMINI_PROXY_URL = "https://merge-smith-gemini-proxy.ami-nagata.workers.de
 document.getElementById("board-image").addEventListener("change", (e) => {
   const name = e.target.files[0]?.name;
   document.getElementById("board-image-filename").textContent = name || "ファイル未選択";
+  document.getElementById("analyze-image").disabled = !name;
 });
 
 document.getElementById("analyze-image").addEventListener("click", async () => {
