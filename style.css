@@ -246,29 +246,6 @@ td.name-cell input {
   padding: 4px;
 }
 
-td.drag-cell {
-  padding: 6px 0;
-  width: 28px;
-}
-
-.row-drag {
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
-  color: var(--text-dim);
-  font-size: 1.1rem;
-  display: inline-block;
-  padding: 4px 6px;
-}
-
-.row-drag-inline {
-  color: var(--text-dim);
-}
-
-.goal-table tr.dragging {
-  background: rgba(79, 195, 247, 0.12);
-}
-
 .goal-logs-badge {
   display: inline-block;
   min-width: 2.4em;

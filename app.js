@@ -54,13 +54,11 @@ function addGoalRow(name = "", icon = "") {
   const tr = document.createElement("tr");
   const iconHtml = icon ? `<img src="./icons/${icon}" class="row-icon" alt="" />` : "";
   tr.innerHTML = `
-    <td class="drag-cell"><span class="row-drag" title="ドラッグして並び替え">⠿</span></td>
     <td class="name-cell">${iconHtml}<input type="text" class="goal-name" value="${name}" placeholder="例: 剣" /></td>
     <td><span class="goal-logs-badge">-</span></td>
     <td><span class="goal-games-badge">-</span></td>
   `;
   tr.querySelector(".goal-name").addEventListener("input", saveState);
-  enableRowDrag(tr, tr.querySelector(".row-drag"));
   goalBody.appendChild(tr);
   recomputeGoalTiers();
 }
@@ -125,39 +123,6 @@ function renderGoalGamesEstimates() {
 
   const crownGamesBadge = document.getElementById("crown-games-badge");
   if (crownGamesBadge) crownGamesBadge.textContent = gamesRangeText(adjustedGoalTarget(rows.length + 1));
-}
-
-// --- drag-to-reorder (mouse + touch) ---------------------------------------
-
-function enableRowDrag(tr, handle) {
-  handle.addEventListener("pointerdown", (e) => {
-    e.preventDefault();
-    tr.classList.add("dragging");
-
-    const onMove = (ev) => {
-      const overRow = [...goalBody.querySelectorAll("tr")]
-        .filter((r) => r !== tr)
-        .find((r) => {
-          const rect = r.getBoundingClientRect();
-          return ev.clientY >= rect.top && ev.clientY <= rect.bottom;
-        });
-      if (!overRow) return;
-      const overRect = overRow.getBoundingClientRect();
-      const isAfter = ev.clientY > overRect.top + overRect.height / 2;
-      if (isAfter) overRow.after(tr); else overRow.before(tr);
-      recomputeGoalTiers();
-    };
-
-    const onUp = () => {
-      tr.classList.remove("dragging");
-      document.removeEventListener("pointermove", onMove);
-      document.removeEventListener("pointerup", onUp);
-      saveState();
-    };
-
-    document.addEventListener("pointermove", onMove);
-    document.addEventListener("pointerup", onUp);
-  });
 }
 
 // --- board grid (tap-to-fill, mirrors the in-game board) --------------------
