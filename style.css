@@ -189,8 +189,21 @@ td.name-cell input {
 }
 
 .goal-table td.name-cell input {
-  width: 9ch;
-  flex: 0 1 auto;
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 0;
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 2px 0;
+  color: var(--text);
+  font-size: 0.85rem;
+  font-family: inherit;
+}
+
+.goal-table td.name-cell input:focus {
+  outline: none;
+  border-bottom: 1px solid var(--accent2);
 }
 
 .digit-table-header {
