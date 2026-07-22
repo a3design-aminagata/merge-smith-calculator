@@ -592,6 +592,8 @@ document.getElementById("analyze-image").addEventListener("click", async () => {
       if (!currentGoalNames().includes(resolved)) addGoalRow(resolved);
     });
 
+    boardCells = new Array(BOARD_ROWS * BOARD_COLS).fill(null);
+
     let placed = 0;
     let skipped = 0;
     (parsed.inventory || []).forEach((item) => {
