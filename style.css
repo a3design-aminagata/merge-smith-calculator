@@ -458,6 +458,62 @@ td.drag-cell {
   color: var(--accent2);
 }
 
+.btn-solid {
+  background: var(--accent2);
+  border: 1px solid var(--accent2);
+  color: #0a1f2b;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.btn-solid:hover {
+  background: #7cd8ff;
+  border-color: #7cd8ff;
+}
+
+.visually-hidden-file {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+  clip: rect(0 0 0 0);
+}
+
+.file-picker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent2);
+  border: 1px solid var(--accent2);
+  color: #0a1f2b;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.file-picker:hover {
+  background: #7cd8ff;
+  border-color: #7cd8ff;
+}
+
+.file-picker-name {
+  font-weight: 400;
+  color: #0a1f2b;
+  background: rgba(10, 31, 43, 0.12);
+  border-radius: 6px;
+  padding: 2px 8px;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .ai-fill {
   background: #17102a;
   border: 1px solid var(--border);

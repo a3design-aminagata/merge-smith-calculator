@@ -541,6 +541,11 @@ document.getElementById("calc-btn").addEventListener("click", () => {
 
 const GEMINI_PROXY_URL = "https://merge-smith-gemini-proxy.ami-nagata.workers.dev";
 
+document.getElementById("board-image").addEventListener("change", (e) => {
+  const name = e.target.files[0]?.name;
+  document.getElementById("board-image-filename").textContent = name || "ファイル未選択";
+});
+
 document.getElementById("analyze-image").addEventListener("click", async () => {
   const status = document.getElementById("analyze-status");
   const fileInput = document.getElementById("board-image");

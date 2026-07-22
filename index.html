@@ -75,17 +75,21 @@
     <p class="note">盤面と同じマス。目標の候補をタップ選択。</p>
 
     <details class="ai-fill">
-      <summary>📷 スクショから自動入力する（試験機能）</summary>
+      <summary>📷 スクショから自動入力する</summary>
       <div class="row">
-        <input type="file" id="board-image" accept="image/*" />
-        <button id="analyze-image" class="btn-add">画像を解析して自動入力</button>
+        <label class="file-picker" for="board-image">
+          <span class="file-picker-label">画像を選択</span>
+          <span class="file-picker-name" id="board-image-filename">ファイル未選択</span>
+        </label>
+        <input type="file" id="board-image" accept="image/*" class="visually-hidden-file" />
+        <button id="analyze-image" class="btn-solid">画像を解析して自動入力</button>
       </div>
       <p class="note" id="analyze-status"></p>
     </details>
 
     <div class="board-grid" id="board-grid"></div>
     <p class="note" id="board-summary">現在の盤面: (空)</p>
-    <button class="btn-add" id="board-clear">盤面を全部空にする</button>
+    <button class="btn-solid" id="board-clear">盤面を全部空にする</button>
   </section>
 
   <section class="card result-card">
