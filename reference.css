@@ -206,6 +206,19 @@
   color: var(--accent2);
 }
 
+.menu-footer {
+  padding-bottom: 24px;
+}
+
+.menu-footer .note {
+  margin: 0 0 8px;
+}
+
+#app-version {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  color: var(--text-dim);
+}
+
 .side-menu-close {
   position: absolute;
   top: 14px;

@@ -604,10 +604,15 @@ const STATE_STORAGE_KEY = "mergeSmithState";
 // 保存済みstateのバージョンが古い場合、goalRowsを最新のデフォルトで上書きし、
 // 古い名前やアイテム構成がキャッシュとして残り続けるのを防ぐ。
 const GOAL_ROWS_VERSION = 2;
+// DIGIT_DEFAULTSの値を変更したら、この番号を上げる。
+// 保存済みstateのバージョンが古い場合、digitsを最新のデフォルトで上書きし、
+// 古い倍率がスマホに残り続けて間違った数字が出るのを防ぐ。
+const DIGIT_DEFAULTS_VERSION = 1;
 
 function saveState() {
   const state = {
     goalRowsVersion: GOAL_ROWS_VERSION,
+    digitDefaultsVersion: DIGIT_DEFAULTS_VERSION,
     digits: Object.fromEntries(
       [...digitTable.querySelectorAll("input[data-digit]")].map((inp) => [inp.dataset.digit, inp.value])
     ),
@@ -651,7 +656,9 @@ renderDigitTable();
 
 const savedState = loadState();
 if (savedState) {
-  if (savedState.digits) {
+  // 保存済みの倍率が古い版のものなら復元せず、最新のデフォルト（描画済み）のまま使う
+  const digitsStale = savedState.digitDefaultsVersion !== DIGIT_DEFAULTS_VERSION;
+  if (savedState.digits && !digitsStale) {
     Object.entries(savedState.digits).forEach(([d, v]) => {
       const inp = digitTable.querySelector(`input[data-digit="${d}"]`);
       if (inp) inp.value = v;
@@ -663,9 +670,25 @@ if (savedState) {
   if (Array.isArray(savedState.boardCells) && savedState.boardCells.length === BOARD_ROWS * BOARD_COLS) {
     boardCells = savedState.boardCells;
   }
+  // 古い保存データを最新版の内容で上書きしておく（次回以降は判定不要になる）
+  if (digitsStale || goalRowsStale) saveState();
 } else {
   DEFAULT_GOAL_ROWS.forEach((r) => addGoalRow(r.name, r.icon));
 }
 
 renderBoardGrid();
 updateBoardSummary();
+
+// --- 保存データのリセット（古い設定が残って数字が合わない時の逃げ道） ----------
+const resetAllBtn = document.getElementById("reset-all");
+if (resetAllBtn) {
+  resetAllBtn.addEventListener("click", () => {
+    if (!confirm("保存されている盤面・倍率・アイテム設定を全部消して、最新の初期設定に戻します。よろしいですか？")) return;
+    resetAllBtn.disabled = true;
+    resetAllBtn.textContent = "リセット中...";
+    try {
+      localStorage.removeItem(STATE_STORAGE_KEY);
+    } catch {}
+    location.reload();
+  });
+}

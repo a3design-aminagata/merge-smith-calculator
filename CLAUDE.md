@@ -1,0 +1,17 @@
+# ブランチ/worktreeでの並行作業ルール
+
+- このプロジェクトはGitHub Pagesが`main`ブランチを直接見て自動ビルド・公開する構成（`https://a3design-aminagata.github.io/merge-smith-calculator/`）。つまり**pushがそのままデプロイ**になる
+- **ブランチ側セッション**：修正してコミットし、GitHub PRを作成してmerge、pushまで自分の判断で確認なしに進めてよい。理由：
+  - `main`は別worktree（リポジトリ直下）にcheckout中のため、ローカルの`git merge`では取り込めない → GitHub PR経由でmergeする
+  - PRのmergeはgitが差分を見て安全に取り込む操作で、他セッションが既にmainに反映した変更を上書きで消すことがない（flashcards等の`firebase deploy`のような無条件上書きとは性質が違う）
+  - mainブランチは保護設定なし、個人用の低リスクなツールであるため
+- **mainセッション**：ブランチ側の変更を取り込むため、作業前に`git pull`してから進める。自分の変更はコミット→pushまで自由に進めてよい（確認不要）
+- ブランチ側セッションはUI変更を行ったら、Previewでスクリーンショットを撮り、画像として（テキスト説明だけでなく）必ずチャットに添付する
+- `worker/`（Cloudflare Worker, gemini-proxy）はGitHub Pagesの対象外で自動デプロイされない。変更した場合は別途`wrangler deploy`を手動実行する必要がある（Cloudflare側でGit連携している可能性もあるため、初回は要確認）
+
+# キャッシュ対策（スマホで古い版が出る問題）
+
+- `scripts/stamp-assets.py` がHTML内のCSS/JS参照に `?v=<内容ハッシュ>` を付け直す。`.git/hooks/pre-commit` から自動実行されるので、手で叩く必要はない（`?v=`を手編集もしない）
+- `.git/hooks/` はGit管理外なので、**新しいクローン/worktreeを作った環境では pre-commit フックを作り直す**必要がある。無い場合はコミット前に `python3 scripts/stamp-assets.py` を手動実行する
+- 新しいCSS/JSファイルを追加したら、`scripts/stamp-assets.py` の `ASSETS` に追記する
+- `app.js` の `DIGIT_DEFAULTS` を変えたら `DIGIT_DEFAULTS_VERSION` を、`DEFAULT_GOAL_ROWS` を変えたら `GOAL_ROWS_VERSION` を必ず+1する。上げないと、既存ユーザーのlocalStorageに残った古い設定が使われ続けて間違った数字が出る
