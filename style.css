@@ -313,6 +313,81 @@ td.name-cell input {
   border: 2px solid #5c4128;
 }
 
+.board-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ゲーム内の「i」ボタン風の丸ボタン（青のツヤありグラデ＋濃紺の縁＋落ち影） */
+.btn-game-round {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 3px solid #04345c;
+  border-radius: 50%;
+  background: radial-gradient(circle at 34% 26%, #5cd0f8 0%, #1f9fdf 38%, #0072c1 72%, #005ba6 100%);
+  box-shadow:
+    inset 0 0 0 2px rgba(122, 214, 255, 0.5),
+    inset 0 -7px 11px rgba(0, 40, 80, 0.45),
+    0 4px 9px rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* 右上のツヤ（ハイライト）。ゲーム内ボタンの光沢を再現している */
+.btn-game-round::after {
+  content: "";
+  position: absolute;
+  top: 13%;
+  right: 15%;
+  width: 27%;
+  height: 21%;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.72);
+  transform: rotate(-32deg);
+  pointer-events: none;
+}
+
+.btn-game-round:hover {
+  box-shadow:
+    inset 0 0 0 2px rgba(150, 226, 255, 0.65),
+    inset 0 -7px 11px rgba(0, 40, 80, 0.4),
+    0 5px 11px rgba(0, 0, 0, 0.5);
+}
+
+.btn-game-round:active {
+  transform: translateY(2px) scale(0.95);
+  box-shadow:
+    inset 0 0 0 2px rgba(122, 214, 255, 0.45),
+    inset 0 -3px 8px rgba(0, 40, 80, 0.5),
+    0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.btn-game-round:focus-visible {
+  outline: 2px solid var(--accent2);
+  outline-offset: 3px;
+}
+
+.btn-game-round-icon {
+  width: 23px;
+  height: 23px;
+  fill: #f7ecb8;
+  stroke: #06304f;
+  stroke-width: 1.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.btn-game-round-icon-line {
+  fill: none;
+  stroke: #06304f;
+  stroke-width: 1.4;
+}
+
 .board-cell {
   position: relative;
   aspect-ratio: 1 / 1;

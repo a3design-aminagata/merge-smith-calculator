@@ -10,7 +10,7 @@
 <link rel="icon" type="image/png" href="./icons/favicon.png" />
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="王冠カウントダウン" />
-<link rel="stylesheet" href="./style.css?v=5f120ea3" />
+<link rel="stylesheet" href="./style.css?v=225478c1" />
 <link rel="stylesheet" href="./reference.css?v=353e5ffb" />
 </head>
 <body>
@@ -66,7 +66,7 @@
   <div class="menu-divider"></div>
 
   <div class="menu-footer">
-    <p class="note">バージョン <span id="app-version">vcb1fc4fa</span></p>
+    <p class="note">バージョン <span id="app-version">v5aee7fbc</span></p>
     <button class="btn-add" id="reset-all">保存データを消して最新の初期設定に戻す</button>
   </div>
 </nav>
@@ -97,7 +97,16 @@
 
     <div class="board-grid" id="board-grid"></div>
     <p class="note" id="board-summary">現在の盤面: (空)</p>
-    <button class="btn-solid" id="board-clear">盤面を全部空にする</button>
+    <div class="board-actions">
+      <button class="btn-game-round" id="board-clear" aria-label="盤面を全部空にする" title="盤面を全部空にする">
+        <svg class="btn-game-round-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9.6 4.8V3.5a1.2 1.2 0 0 1 1.2-1.2h2.4a1.2 1.2 0 0 1 1.2 1.2v1.3" />
+          <rect x="3.6" y="4.8" width="16.8" height="2.9" rx="1.45" />
+          <path d="M5.9 7.7h12.2l-1 12.4a1.8 1.8 0 0 1-1.8 1.6H8.7a1.8 1.8 0 0 1-1.8-1.6Z" />
+          <path class="btn-game-round-icon-line" d="M10.2 11.2v6.6M13.8 11.2v6.6" />
+        </svg>
+      </button>
+    </div>
   </section>
 
   <section class="card result-card">
