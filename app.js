@@ -441,7 +441,27 @@ function gamesNeededFrom(startDigit, remaining, boosted) {
   return games;
 }
 
-document.getElementById("calc-btn").addEventListener("click", () => {
+const resultAreaEl = document.getElementById("result");
+
+// 解析→自動計算の間、結果欄を空白のまま放置しない（「0件」と見分けがつかないため）
+function showResultLoading() {
+  resultAreaEl.innerHTML = `
+    <div class="result-loading">
+      <span class="spinner" aria-hidden="true"></span>盤面を読み取って計算しています…
+      <div class="skeleton-lines">
+        <span class="skeleton-line"></span>
+        <span class="skeleton-line"></span>
+        <span class="skeleton-line"></span>
+      </div>
+    </div>
+  `;
+}
+
+function clearResultLoading() {
+  if (resultAreaEl.querySelector(".result-loading")) resultAreaEl.innerHTML = "";
+}
+
+function runCalculation() {
   const target = goalTarget();
 
   const invByName = {};
@@ -500,26 +520,56 @@ document.getElementById("calc-btn").addEventListener("click", () => {
       </table>
     </div>
   `;
-});
+}
+
+document.getElementById("calc-btn").addEventListener("click", runCalculation);
 
 // --- AI image fill (optional) -----------------------------------------------
 
 const GEMINI_PROXY_URL = "https://merge-smith-gemini-proxy.ami-nagata.workers.dev";
 
+const analyzeBtn = document.getElementById("analyze-image");
+const filePickerLabel = document.querySelector(".file-picker");
+let analyzing = false;
+
+// 解析中は「押しても何も起きていないように見える」状態を作らないため、
+// ボタンとファイル選択の両方を無効化して文言も差し替える。
+function setAnalyzing(busy) {
+  analyzing = busy;
+  analyzeBtn.disabled = busy || !document.getElementById("board-image").files[0];
+  analyzeBtn.textContent = busy ? "解析中..." : "画像を解析して自動入力";
+  if (filePickerLabel) filePickerLabel.classList.toggle("is-busy", busy);
+}
+
+function setAnalyzeStatus(text, { loading = false, error = false } = {}) {
+  const status = document.getElementById("analyze-status");
+  status.classList.toggle("warn", error);
+  status.innerHTML = loading
+    ? `<span class="spinner" aria-hidden="true"></span>${text}`
+    : text;
+}
+
 document.getElementById("board-image").addEventListener("change", (e) => {
   const name = e.target.files[0]?.name;
   document.getElementById("board-image-filename").textContent = name || "ファイル未選択";
-  document.getElementById("analyze-image").disabled = !name;
+  // 解析中はボタンの無効表示を解除しない（解析中...のまま押せる見た目にしない）
+  if (analyzing) return;
+  analyzeBtn.disabled = !name;
+  // 画像を選んだ時点でボタンを押させずそのまま解析を始める
+  if (name) runAnalysis();
 });
 
-document.getElementById("analyze-image").addEventListener("click", async () => {
-  const status = document.getElementById("analyze-status");
+analyzeBtn.addEventListener("click", () => { if (!analyzing) runAnalysis(); });
+
+async function runAnalysis() {
   const fileInput = document.getElementById("board-image");
   const file = fileInput.files[0];
 
-  if (!file) { status.textContent = "画像を選択してください。"; return; }
+  if (!file) { setAnalyzeStatus("画像を選択してください。", { error: true }); return; }
 
-  status.textContent = "解析中...";
+  setAnalyzing(true);
+  setAnalyzeStatus("画像を解析中...", { loading: true });
+  showResultLoading();
 
   try {
     const base64 = await fileToBase64(file);
@@ -581,12 +631,17 @@ document.getElementById("analyze-image").addEventListener("click", async () => {
     updateBoardSummary();
 
     const goalItemNames = parsed.goalItemNames || [];
-    status.textContent = `解析完了。目標${goalItemNames.length}件を追加し、盤面に${placed}個を配置しました。${skipped ? `（盤面が満杯のため${skipped}個は未配置）` : ""}内容を確認・修正してください。`;
+    setAnalyzeStatus(`解析完了。目標${goalItemNames.length}件を追加し、盤面に${placed}個を配置しました。${skipped ? `（盤面が満杯のため${skipped}個は未配置）` : ""}内容を確認・修正してください。`);
     saveState();
+    // 解析結果をそのまま使って計算まで自動で走らせる
+    runCalculation();
   } catch (err) {
-    status.textContent = "解析に失敗しました: " + err.message;
+    setAnalyzeStatus("解析に失敗しました: " + err.message, { error: true });
+    clearResultLoading();
+  } finally {
+    setAnalyzing(false);
   }
-});
+}
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
