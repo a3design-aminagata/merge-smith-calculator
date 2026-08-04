@@ -6,6 +6,13 @@
 # 新規クローンで消えてしまい、スタンプされないまま本番へ出る事故になりうる。
 set -e
 ROOT=$(git rev-parse --show-toplevel)
+
+# app.jsのデフォルト値を変えたのにバージョン番号を上げ忘れていたらコミットを止める。
+# スタンプより先に走らせて、落ちる時は何も書き換えずに終わらせる。
+if [ -f "$ROOT/scripts/check-version-bumps.py" ]; then
+  python3 "$ROOT/scripts/check-version-bumps.py" || exit 1
+fi
+
 [ -f "$ROOT/scripts/stamp-assets.py" ] || exit 0
 python3 "$ROOT/scripts/stamp-assets.py"
 git add "$ROOT/index.html" "$ROOT/reference.html" 2>/dev/null || true

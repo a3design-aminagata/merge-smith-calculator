@@ -23,3 +23,6 @@
   - Claude Codeを通さずに使うクローンでのみ、1回だけ `git config core.hooksPath .githooks` が必要
 - 新しいCSS/JSファイルを追加したら、`scripts/stamp-assets.py` の `ASSETS` に追記する
 - `app.js` の `DIGIT_DEFAULTS` を変えたら `DIGIT_DEFAULTS_VERSION` を、`DEFAULT_GOAL_ROWS` を変えたら `GOAL_ROWS_VERSION` を必ず+1する。上げないと、既存ユーザーのlocalStorageに残った古い設定が使われ続けて間違った数字が出る
+  - これは`scripts/check-version-bumps.py`（pre-commitから実行）が強制する。上げ忘れているとコミットが止まり、どの定数をいくつにすべきか表示される
+  - 判定はリテラル部分の文字列比較（空白は正規化）なので、インデントや改行位置を変えただけでは発火しない
+  - 意図的に上げずにコミットしたい場合のみ`git commit --no-verify`（ただしstamp-assetsも同時に無効になる点に注意）
