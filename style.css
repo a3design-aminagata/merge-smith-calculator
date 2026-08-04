@@ -323,7 +323,7 @@ td.name-cell input {
 .btn-game-round,
 .btn-game-pill {
   border: none;
-  background: radial-gradient(circle at 34% 26%, #5cd0f8 0%, #1f9fdf 38%, #0072c1 72%, #005ba6 100%);
+  background: linear-gradient(180deg, #0287cc 0%, #027bc4 100%);
   box-shadow:
     inset 0 0 0 2px #04345c,
     inset 0 -7px 11px rgba(0, 40, 80, 0.45),
@@ -368,15 +368,17 @@ td.name-cell input {
   pointer-events: none;
 }
 
+/* 横長ボタンのツヤは右端だけに小さく置く（全体に広げるとぷるぷるして見えるため） */
 .btn-game-pill::after {
   content: "";
   position: absolute;
-  top: 4px;
-  left: 10px;
-  right: 10px;
-  height: 36%;
-  border-radius: 999px;
-  background: linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.03));
+  top: 18%;
+  right: 11px;
+  width: 17px;
+  height: 30%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0));
+  transform: rotate(-32deg);
   pointer-events: none;
 }
 
@@ -636,20 +638,58 @@ td.name-cell input {
   border-color: var(--accent);
 }
 
+/* ゲーム内の緑ボタン（金の縁取り＋緑のツヤ玉）と同じ配色。
+   縁を金のグラデにするため、透明borderに2枚重ねの背景を敷いている。 */
 .btn-calc {
   width: 100%;
-  background: linear-gradient(135deg, var(--accent), #e08a1a);
-  border: none;
-  color: #2a1a00;
+  position: relative;
+  border: 5px solid transparent;
+  border-radius: 16px;
+  padding: 12px;
+  background-image:
+    linear-gradient(180deg, #6de340 0%, #43be2a 48%, #1e8c1b 100%),
+    linear-gradient(180deg, #ffd500 0%, #ffae00 55%, #dc5d00 100%);
+  background-origin: border-box;
+  background-clip: padding-box, border-box;
+  box-shadow:
+    0 0 0 2px #c2551f,
+    0 5px 10px rgba(0, 0, 0, 0.45);
+  color: #fff;
   font-weight: 700;
   font-size: 1rem;
-  padding: 12px;
-  border-radius: 10px;
+  text-shadow: 0 2px 3px rgba(0, 60, 10, 0.8);
   cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+
+/* ツヤは丸ボタン・ピルボタンと同じく右端だけ */
+.btn-calc::after {
+  content: "";
+  position: absolute;
+  top: 16%;
+  right: 14px;
+  width: 20px;
+  height: 34%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
+  transform: rotate(-32deg);
+  pointer-events: none;
 }
 
 .btn-calc:hover {
-  filter: brightness(1.05);
+  filter: brightness(1.06);
+}
+
+.btn-calc:active {
+  transform: translateY(2px) scale(0.99);
+  box-shadow:
+    0 0 0 2px #c2551f,
+    0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.btn-calc:focus-visible {
+  outline: 2px solid var(--accent2);
+  outline-offset: 3px;
 }
 
 #result {
