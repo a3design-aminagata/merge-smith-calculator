@@ -528,17 +528,17 @@ document.getElementById("calc-btn").addEventListener("click", runCalculation);
 
 const GEMINI_PROXY_URL = "https://merge-smith-gemini-proxy.ami-nagata.workers.dev";
 
-const analyzeBtn = document.getElementById("analyze-image");
-const filePickerLabel = document.querySelector(".file-picker");
+const pickImageBtn = document.getElementById("pick-image");
+const pickImageLabel = document.getElementById("pick-image-label");
+const boardImageInput = document.getElementById("board-image");
 let analyzing = false;
 
 // 解析中は「押しても何も起きていないように見える」状態を作らないため、
-// ボタンとファイル選択の両方を無効化して文言も差し替える。
+// ボタンを無効化して文言も差し替える。
 function setAnalyzing(busy) {
   analyzing = busy;
-  analyzeBtn.disabled = busy || !document.getElementById("board-image").files[0];
-  analyzeBtn.textContent = busy ? "解析中..." : "画像を解析して自動入力";
-  if (filePickerLabel) filePickerLabel.classList.toggle("is-busy", busy);
+  pickImageBtn.disabled = busy;
+  pickImageLabel.textContent = busy ? "解析中..." : "スクショから自動入力";
 }
 
 function setAnalyzeStatus(text, { loading = false, error = false } = {}) {
@@ -549,26 +549,22 @@ function setAnalyzeStatus(text, { loading = false, error = false } = {}) {
     : text;
 }
 
-document.getElementById("board-image").addEventListener("change", (e) => {
-  const name = e.target.files[0]?.name;
-  document.getElementById("board-image-filename").textContent = name || "ファイル未選択";
-  // 解析中はボタンの無効表示を解除しない（解析中...のまま押せる見た目にしない）
-  if (analyzing) return;
-  analyzeBtn.disabled = !name;
-  // 画像を選んだ時点でボタンを押させずそのまま解析を始める
-  if (name) runAnalysis();
+pickImageBtn.addEventListener("click", () => {
+  if (!analyzing) boardImageInput.click();
 });
 
-analyzeBtn.addEventListener("click", () => { if (!analyzing) runAnalysis(); });
+boardImageInput.addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  // 同じファイルを選び直してもchangeが発火するように、値は毎回クリアしておく
+  e.target.value = "";
+  if (file && !analyzing) runAnalysis(file);
+});
 
-async function runAnalysis() {
-  const fileInput = document.getElementById("board-image");
-  const file = fileInput.files[0];
-
+async function runAnalysis(file) {
   if (!file) { setAnalyzeStatus("画像を選択してください。", { error: true }); return; }
 
   setAnalyzing(true);
-  setAnalyzeStatus("画像を解析中...", { loading: true });
+  setAnalyzeStatus(`${file.name} を解析中...`, { loading: true });
   showResultLoading();
 
   try {

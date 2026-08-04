@@ -318,19 +318,17 @@ td.name-cell input {
   justify-content: flex-end;
 }
 
-/* ゲーム内の「i」ボタン風の丸ボタン（青のツヤありグラデ＋濃紺の縁＋落ち影） */
-.btn-game-round {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: 3px solid #04345c;
-  border-radius: 50%;
+/* ゲーム内の「i」ボタン風（青のツヤありグラデ＋濃紺の縁＋落ち影）。
+   縁はborderではなく内側シャドウのリングで描いている。 */
+.btn-game-round,
+.btn-game-pill {
+  border: none;
   background: radial-gradient(circle at 34% 26%, #5cd0f8 0%, #1f9fdf 38%, #0072c1 72%, #005ba6 100%);
   box-shadow:
-    inset 0 0 0 2px rgba(122, 214, 255, 0.5),
+    inset 0 0 0 2px #04345c,
     inset 0 -7px 11px rgba(0, 40, 80, 0.45),
     0 4px 9px rgba(0, 0, 0, 0.45);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   position: relative;
@@ -338,7 +336,25 @@ td.name-cell input {
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-/* 右上のツヤ（ハイライト）。ゲーム内ボタンの光沢を再現している */
+.btn-game-round {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.btn-game-pill {
+  min-height: 42px;
+  padding: 0 18px;
+  gap: 8px;
+  border-radius: 999px;
+  color: #f7ecb8;
+  font-weight: 700;
+  font-size: 0.86rem;
+  text-shadow: 0 1px 2px rgba(0, 32, 60, 0.7);
+}
+
+/* ツヤ（ハイライト）。ゲーム内ボタンの光沢を再現している */
 .btn-game-round::after {
   content: "";
   position: absolute;
@@ -352,29 +368,52 @@ td.name-cell input {
   pointer-events: none;
 }
 
-.btn-game-round:hover {
-  box-shadow:
-    inset 0 0 0 2px rgba(150, 226, 255, 0.65),
-    inset 0 -7px 11px rgba(0, 40, 80, 0.4),
-    0 5px 11px rgba(0, 0, 0, 0.5);
+.btn-game-pill::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 10px;
+  right: 10px;
+  height: 36%;
+  border-radius: 999px;
+  background: linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.03));
+  pointer-events: none;
 }
 
-.btn-game-round:active {
-  transform: translateY(2px) scale(0.95);
+.btn-game-round:hover,
+.btn-game-pill:hover {
   box-shadow:
-    inset 0 0 0 2px rgba(122, 214, 255, 0.45),
+    inset 0 0 0 2px #04345c,
+    inset 0 -7px 11px rgba(0, 40, 80, 0.32),
+    0 5px 12px rgba(0, 0, 0, 0.5);
+}
+
+.btn-game-round:active,
+.btn-game-pill:active {
+  transform: translateY(2px) scale(0.97);
+  box-shadow:
+    inset 0 0 0 2px #04345c,
     inset 0 -3px 8px rgba(0, 40, 80, 0.5),
     0 1px 4px rgba(0, 0, 0, 0.45);
 }
 
-.btn-game-round:focus-visible {
+.btn-game-round:focus-visible,
+.btn-game-pill:focus-visible {
   outline: 2px solid var(--accent2);
   outline-offset: 3px;
 }
 
-.btn-game-round-icon {
-  width: 23px;
-  height: 23px;
+.btn-game-round:disabled,
+.btn-game-pill:disabled {
+  filter: grayscale(0.5) brightness(0.72);
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-game-icon {
+  width: 22px;
+  height: 22px;
+  flex: none;
   fill: #f7ecb8;
   stroke: #06304f;
   stroke-width: 1.5;
@@ -382,7 +421,12 @@ td.name-cell input {
   stroke-linecap: round;
 }
 
-.btn-game-round-icon-line {
+.btn-game-round .btn-game-icon {
+  width: 23px;
+  height: 23px;
+}
+
+.btn-game-icon-line {
   fill: none;
   stroke: #06304f;
   stroke-width: 1.4;
@@ -525,29 +569,6 @@ td.name-cell input {
   color: var(--accent2);
 }
 
-.btn-solid {
-  background: var(--info-blue);
-  border: 1px solid var(--info-blue);
-  color: #fff;
-  font-weight: 700;
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 0.82rem;
-  cursor: pointer;
-}
-
-.btn-solid:hover {
-  background: var(--info-blue-hover);
-  border-color: var(--info-blue-hover);
-}
-
-.btn-solid:disabled {
-  background: none;
-  border: 1px dashed var(--border);
-  color: var(--text-dim);
-  cursor: not-allowed;
-}
-
 .visually-hidden-file {
   position: absolute;
   width: 1px;
@@ -555,39 +576,6 @@ td.name-cell input {
   overflow: hidden;
   opacity: 0;
   clip: rect(0 0 0 0);
-}
-
-.file-picker {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: var(--info-blue);
-  border: 1px solid var(--info-blue);
-  color: #fff;
-  font-weight: 700;
-  border-radius: 8px;
-  padding: 6px 14px;
-  font-size: 0.82rem;
-  cursor: pointer;
-}
-
-.file-picker:hover {
-  background: var(--info-blue-hover);
-  border-color: var(--info-blue-hover);
-}
-
-/* 解析中はファイル選択もロックする（連打で二重解析させないため） */
-.file-picker.is-busy {
-  background: none;
-  border: 1px dashed var(--border);
-  color: var(--text-dim);
-  cursor: not-allowed;
-  pointer-events: none;
-}
-
-.file-picker.is-busy .file-picker-name {
-  color: var(--text-dim);
-  background: rgba(255, 255, 255, 0.06);
 }
 
 .spinner {
@@ -636,34 +624,12 @@ td.name-cell input {
   to { background-position: -200% 0; }
 }
 
-.file-picker-name {
-  font-weight: 400;
-  color: #fff;
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 6px;
-  padding: 2px 8px;
-  max-width: 180px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .ai-fill {
-  background: #17102a;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 8px 12px;
   margin-bottom: 14px;
 }
 
-.ai-fill summary {
-  cursor: pointer;
-  font-size: 0.85rem;
-  color: var(--accent2);
-}
-
-.ai-fill .row {
-  margin-top: 10px;
+.ai-fill .note {
+  margin-top: 8px;
 }
 
 .result-card {

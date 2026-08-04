@@ -10,7 +10,7 @@
 <link rel="icon" type="image/png" href="./icons/favicon.png" />
 <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
 <meta name="apple-mobile-web-app-title" content="王冠カウントダウン" />
-<link rel="stylesheet" href="./style.css?v=225478c1" />
+<link rel="stylesheet" href="./style.css?v=5ccb6cb1" />
 <link rel="stylesheet" href="./reference.css?v=353e5ffb" />
 </head>
 <body>
@@ -66,7 +66,7 @@
   <div class="menu-divider"></div>
 
   <div class="menu-footer">
-    <p class="note">バージョン <span id="app-version">v5aee7fbc</span></p>
+    <p class="note">バージョン <span id="app-version">vf8291d80</span></p>
     <button class="btn-add" id="reset-all">保存データを消して最新の初期設定に戻す</button>
   </div>
 </nav>
@@ -82,28 +82,27 @@
     <h2><img src="./icons/icon-helmet.png" class="h2-icon" alt="" /> 1 今の盤面</h2>
     <p class="note">盤面と同じマス。目標の候補をタップ選択。</p>
 
-    <details class="ai-fill">
-      <summary>📷 スクショから自動入力する</summary>
-      <div class="row">
-        <label class="file-picker" for="board-image">
-          <span class="file-picker-label">画像を選択</span>
-          <span class="file-picker-name" id="board-image-filename">ファイル未選択</span>
-        </label>
-        <input type="file" id="board-image" accept="image/*" class="visually-hidden-file" />
-        <button id="analyze-image" class="btn-solid" disabled>画像を解析して自動入力</button>
-      </div>
+    <div class="ai-fill">
+      <button class="btn-game-pill" id="pick-image" type="button">
+        <svg class="btn-game-icon" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M9.2 4.3h5.6l1.3 2.3h3.2a1.7 1.7 0 0 1 1.7 1.7v9.7a1.7 1.7 0 0 1-1.7 1.7H4.7A1.7 1.7 0 0 1 3 18V8.3a1.7 1.7 0 0 1 1.7-1.7h3.2Z" />
+          <circle class="btn-game-icon-line" cx="12" cy="13.2" r="3.7" />
+        </svg>
+        <span id="pick-image-label">スクショから自動入力</span>
+      </button>
+      <input type="file" id="board-image" accept="image/*" class="visually-hidden-file" />
       <p class="note" id="analyze-status"></p>
-    </details>
+    </div>
 
     <div class="board-grid" id="board-grid"></div>
     <p class="note" id="board-summary">現在の盤面: (空)</p>
     <div class="board-actions">
       <button class="btn-game-round" id="board-clear" aria-label="盤面を全部空にする" title="盤面を全部空にする">
-        <svg class="btn-game-round-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <svg class="btn-game-icon" viewBox="0 0 24 24" aria-hidden="true">
           <path d="M9.6 4.8V3.5a1.2 1.2 0 0 1 1.2-1.2h2.4a1.2 1.2 0 0 1 1.2 1.2v1.3" />
           <rect x="3.6" y="4.8" width="16.8" height="2.9" rx="1.45" />
           <path d="M5.9 7.7h12.2l-1 12.4a1.8 1.8 0 0 1-1.8 1.6H8.7a1.8 1.8 0 0 1-1.8-1.6Z" />
-          <path class="btn-game-round-icon-line" d="M10.2 11.2v6.6M13.8 11.2v6.6" />
+          <path class="btn-game-icon-line" d="M10.2 11.2v6.6M13.8 11.2v6.6" />
         </svg>
       </button>
     </div>
@@ -127,6 +126,6 @@
 </div>
 
 <script src="./menu.js?v=d33258e5"></script>
-<script src="./app.js?v=21bbbb51"></script>
+<script src="./app.js?v=d3e45762"></script>
 </body>
 </html>
