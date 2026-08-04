@@ -368,20 +368,6 @@ td.name-cell input {
   pointer-events: none;
 }
 
-/* 横長ボタンのツヤは右端だけに小さく置く（全体に広げるとぷるぷるして見えるため） */
-.btn-game-pill::after {
-  content: "";
-  position: absolute;
-  top: 18%;
-  right: 11px;
-  width: 17px;
-  height: 30%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0));
-  transform: rotate(-32deg);
-  pointer-events: none;
-}
-
 .btn-game-round:hover,
 .btn-game-pill:hover {
   box-shadow:
@@ -646,13 +632,11 @@ td.name-cell input {
   border: 5px solid transparent;
   border-radius: 16px;
   padding: 12px;
-  background-image:
-    linear-gradient(180deg, #6de340 0%, #43be2a 48%, #1e8c1b 100%),
-    linear-gradient(180deg, #ffd500 0%, #ffae00 55%, #dc5d00 100%);
+  background-image: linear-gradient(180deg, #6de340 0%, #43be2a 48%, #1e8c1b 100%);
   background-origin: border-box;
-  background-clip: padding-box, border-box;
+  background-clip: padding-box;
   box-shadow:
-    0 0 0 2px #c2551f,
+    0 0 0 2px #ffd500,
     0 5px 10px rgba(0, 0, 0, 0.45);
   color: #fff;
   font-weight: 700;
@@ -662,20 +646,6 @@ td.name-cell input {
   transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
-/* ツヤは丸ボタン・ピルボタンと同じく右端だけ */
-.btn-calc::after {
-  content: "";
-  position: absolute;
-  top: 16%;
-  right: 14px;
-  width: 20px;
-  height: 34%;
-  border-radius: 50%;
-  background: radial-gradient(closest-side, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0));
-  transform: rotate(-32deg);
-  pointer-events: none;
-}
-
 .btn-calc:hover {
   filter: brightness(1.06);
 }
@@ -683,7 +653,7 @@ td.name-cell input {
 .btn-calc:active {
   transform: translateY(2px) scale(0.99);
   box-shadow:
-    0 0 0 2px #c2551f,
+    0 0 0 2px #ffd500,
     0 1px 4px rgba(0, 0, 0, 0.45);
 }
 
