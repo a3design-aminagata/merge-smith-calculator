@@ -7,7 +7,10 @@
   - mainブランチは保護設定なし、個人用の低リスクなツールであるため
 - **mainセッション**：ブランチ側の変更を取り込むため、作業前に`git pull`してから進める。自分の変更はコミット→pushまで自由に進めてよい（確認不要）
 - ブランチ側セッションはUI変更を行ったら、Previewでスクリーンショットを撮り、画像として（テキスト説明だけでなく）必ずチャットに添付する
-- `worker/`（Cloudflare Worker, gemini-proxy）はGitHub Pagesの対象外で自動デプロイされない。変更した場合は別途`wrangler deploy`を手動実行する必要がある（Cloudflare側でGit連携している可能性もあるため、初回は要確認）
+- `worker/`（Cloudflare Worker, gemini-proxy）はGitHub Pagesの対象外。Cloudflare側にGit連携は無いが、`.github/workflows/deploy-worker.yml`（GitHub Actions）が`worker/**`の変更を含むmainへのpushを検知して`wrangler deploy`を実行する。**手動デプロイは不要**
+  - 必要なGitHub Secrets: `CLOUDFLARE_API_TOKEN`（Edit Cloudflare Workers権限）、`CLOUDFLARE_ACCOUNT_ID`
+  - `GEMINI_API_KEY`はCloudflare側のSecretとして保持されており、`wrangler deploy`では消えない。ワークフローでは触らない
+  - 手動で再デプロイしたい時はGitHubのActionsタブから`Deploy Cloudflare Worker`を`workflow_dispatch`で実行する（iPhoneのGitHubアプリからも可能）
 
 # キャッシュ対策（スマホで古い版が出る問題）
 

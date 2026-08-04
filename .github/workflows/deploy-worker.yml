@@ -1,0 +1,35 @@
+name: Deploy Cloudflare Worker
+
+# worker/ 配下が変わった main への push だけでデプロイする。
+# GitHub Pages と違い Cloudflare 側に Git 連携が無いため、ここが唯一の自動デプロイ経路。
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'worker/**'
+      - '.github/workflows/deploy-worker.yml'
+  workflow_dispatch:
+
+# 連続 push でデプロイが並走しないようにする（後勝ちで直列実行）
+concurrency:
+  group: deploy-worker
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Deploy with Wrangler
+        uses: cloudflare/wrangler-action@v4
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: worker
+          # ローカルと同じ挙動になるようバージョンを固定
+          wranglerVersion: '4.118.0'
