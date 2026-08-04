@@ -354,20 +354,6 @@ td.name-cell input {
   text-shadow: 0 1px 2px rgba(0, 32, 60, 0.7);
 }
 
-/* ツヤ（ハイライト）。ゲーム内ボタンの光沢を再現している */
-.btn-game-round::after {
-  content: "";
-  position: absolute;
-  top: 13%;
-  right: 15%;
-  width: 27%;
-  height: 21%;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.72);
-  transform: rotate(-32deg);
-  pointer-events: none;
-}
-
 .btn-game-round:hover,
 .btn-game-pill:hover {
   box-shadow:
@@ -624,20 +610,15 @@ td.name-cell input {
   border-color: var(--accent);
 }
 
-/* ゲーム内の緑ボタン（金の縁取り＋緑のツヤ玉）と同じ配色。
-   縁を金のグラデにするため、透明borderに2枚重ねの背景を敷いている。 */
+/* ゲーム内の「Play」ボタンと同じ配色（緑の縁＋緑のグラデ、ツヤなし） */
 .btn-calc {
   width: 100%;
   position: relative;
-  border: 5px solid transparent;
+  border: 4px solid #4a8b00;
   border-radius: 16px;
   padding: 12px;
-  background-image: linear-gradient(180deg, #6de340 0%, #43be2a 48%, #1e8c1b 100%);
-  background-origin: border-box;
-  background-clip: padding-box;
-  box-shadow:
-    0 0 0 2px #ffd500,
-    0 5px 10px rgba(0, 0, 0, 0.45);
+  background-image: linear-gradient(180deg, #b2db55 0%, #9ed302 10%, #7eb501 55%, #4a8b00 100%);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.45);
   color: #fff;
   font-weight: 700;
   font-size: 1rem;
@@ -652,9 +633,7 @@ td.name-cell input {
 
 .btn-calc:active {
   transform: translateY(2px) scale(0.99);
-  box-shadow:
-    0 0 0 2px #ffd500,
-    0 1px 4px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
 }
 
 .btn-calc:focus-visible {
