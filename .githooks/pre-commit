@@ -1,0 +1,11 @@
+#!/bin/sh
+# HTML内のCSS/JSに ?v=<内容ハッシュ> を自動で付け直す（キャッシュバスティング）
+#
+# このファイルはGit管理下にあり、core.hooksPath=.githooks で参照される。
+# 以前は .git/hooks/pre-commit に直接置いていたが、そこはGit管理外のため
+# 新規クローンで消えてしまい、スタンプされないまま本番へ出る事故になりうる。
+set -e
+ROOT=$(git rev-parse --show-toplevel)
+[ -f "$ROOT/scripts/stamp-assets.py" ] || exit 0
+python3 "$ROOT/scripts/stamp-assets.py"
+git add "$ROOT/index.html" "$ROOT/reference.html" 2>/dev/null || true

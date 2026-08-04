@@ -8,6 +8,12 @@
             "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/git-sync.sh\"",
             "timeout": 30,
             "statusMessage": "リモートと同期中..."
+          },
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/ensure-git-hooks.sh\"",
+            "timeout": 15,
+            "statusMessage": "pre-commitフックを確認中..."
           }
         ]
       }

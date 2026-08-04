@@ -16,7 +16,10 @@
 
 # キャッシュ対策（スマホで古い版が出る問題）
 
-- `scripts/stamp-assets.py` がHTML内のCSS/JS参照に `?v=<内容ハッシュ>` を付け直す。`.git/hooks/pre-commit` から自動実行されるので、手で叩く必要はない（`?v=`を手編集もしない）
-- `.git/hooks/` はGit管理外なので、**新しいクローン/worktreeを作った環境では pre-commit フックを作り直す**必要がある。無い場合はコミット前に `python3 scripts/stamp-assets.py` を手動実行する
+- `scripts/stamp-assets.py` がHTML内のCSS/JS参照に `?v=<内容ハッシュ>` を付け直す。`.githooks/pre-commit` から自動実行されるので、手で叩く必要はない（`?v=`を手編集もしない）
+- フック本体は`.githooks/`（**Git管理下**）にあり、`core.hooksPath=.githooks` で参照される。フックの作り直しは不要
+  - `core.hooksPath`はローカル設定なので新規クローンでは未設定だが、`.claude/hooks/ensure-git-hooks.sh`（SessionStartフック）が自動で設定する
+  - worktreeは親リポジトリのgit configを共有するため、そのまま効く（`.git/hooks`時代も共有されていた）
+  - Claude Codeを通さずに使うクローンでのみ、1回だけ `git config core.hooksPath .githooks` が必要
 - 新しいCSS/JSファイルを追加したら、`scripts/stamp-assets.py` の `ASSETS` に追記する
 - `app.js` の `DIGIT_DEFAULTS` を変えたら `DIGIT_DEFAULTS_VERSION` を、`DEFAULT_GOAL_ROWS` を変えたら `GOAL_ROWS_VERSION` を必ず+1する。上げないと、既存ユーザーのlocalStorageに残った古い設定が使われ続けて間違った数字が出る
