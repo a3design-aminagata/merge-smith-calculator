@@ -384,26 +384,15 @@ td.name-cell input {
   transform: none;
 }
 
-.btn-game-icon {
-  width: 22px;
-  height: 22px;
+.btn-game-emoji {
   flex: none;
-  fill: #f7ecb8;
-  stroke: #06304f;
-  stroke-width: 1.5;
-  stroke-linejoin: round;
-  stroke-linecap: round;
+  font-size: 18px;
+  line-height: 1;
+  text-shadow: 0 1px 2px rgba(0, 32, 60, 0.6);
 }
 
-.btn-game-round .btn-game-icon {
-  width: 23px;
-  height: 23px;
-}
-
-.btn-game-icon-line {
-  fill: none;
-  stroke: #06304f;
-  stroke-width: 1.4;
+.btn-game-round .btn-game-emoji {
+  font-size: 20px;
 }
 
 .board-cell {
