@@ -320,7 +320,6 @@ td.name-cell input {
 
 /* ゲーム内の「i」ボタン風（青のツヤありグラデ＋濃紺の縁＋落ち影）。
    縁はborderではなく内側シャドウのリングで描いている。 */
-.btn-game-round,
 .btn-game-pill {
   border: none;
   background: linear-gradient(180deg, #0287cc 0%, #027bc4 100%);
@@ -334,16 +333,6 @@ td.name-cell input {
   position: relative;
   cursor: pointer;
   transition: transform 0.1s ease, box-shadow 0.1s ease;
-}
-
-.btn-game-round {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border-radius: 50%;
-}
-
-.btn-game-pill {
   min-height: 42px;
   padding: 0 18px;
   gap: 8px;
@@ -354,7 +343,6 @@ td.name-cell input {
   text-shadow: 0 1px 2px rgba(0, 32, 60, 0.7);
 }
 
-.btn-game-round:hover,
 .btn-game-pill:hover {
   box-shadow:
     inset 0 0 0 2px #04345c,
@@ -362,7 +350,6 @@ td.name-cell input {
     0 5px 12px rgba(0, 0, 0, 0.5);
 }
 
-.btn-game-round:active,
 .btn-game-pill:active {
   transform: translateY(2px) scale(0.97);
   box-shadow:
@@ -371,13 +358,11 @@ td.name-cell input {
     0 1px 4px rgba(0, 0, 0, 0.45);
 }
 
-.btn-game-round:focus-visible,
 .btn-game-pill:focus-visible {
   outline: 2px solid var(--accent2);
   outline-offset: 3px;
 }
 
-.btn-game-round:disabled,
 .btn-game-pill:disabled {
   filter: grayscale(0.5) brightness(0.72);
   cursor: not-allowed;
@@ -389,10 +374,6 @@ td.name-cell input {
   font-size: 18px;
   line-height: 1;
   text-shadow: 0 1px 2px rgba(0, 32, 60, 0.6);
-}
-
-.btn-game-round .btn-game-emoji {
-  font-size: 20px;
 }
 
 .board-cell {
