@@ -20,7 +20,7 @@
 - フック本体は`.githooks/`（**Git管理下**）にあり、`core.hooksPath=.githooks` で参照される。フックの作り直しは不要
   - `core.hooksPath`はローカル設定なので新規クローンでは未設定だが、`.claude/hooks/ensure-git-hooks.sh`（SessionStartフック）が自動で設定する
   - worktreeは親リポジトリのgit configを共有するため、そのまま効く（`.git/hooks`時代も共有されていた）
-  - Claude Codeを通さずに使うクローンでのみ、1回だけ `git config core.hooksPath .githooks` が必要
+  - セッション開始フックを通さずに使うクローンでのみ、1回だけ `git config core.hooksPath .githooks` が必要
 - 新しいCSS/JSファイルを追加したら、`scripts/stamp-assets.py` の `ASSETS` に追記する
 - `app.js` の `DIGIT_DEFAULTS` を変えたら `DIGIT_DEFAULTS_VERSION` を、`DEFAULT_GOAL_ROWS` を変えたら `GOAL_ROWS_VERSION` を必ず+1する。上げないと、既存ユーザーのlocalStorageに残った古い設定が使われ続けて間違った数字が出る
   - これは`scripts/check-version-bumps.py`（pre-commitから実行）が強制する。上げ忘れているとコミットが止まり、どの定数をいくつにすべきか表示される
