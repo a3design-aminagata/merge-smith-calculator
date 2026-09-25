@@ -1,24 +1,30 @@
-# ブランチ/worktreeでの並行作業ルール
+# merge-smith-calculator プロジェクト指示
 
-- このプロジェクトはGitHub Pagesが`main`ブランチを直接見て自動ビルド・公開する構成（`https://a3design-aminagata.github.io/merge-smith-calculator/`）。つまり**pushがそのままデプロイ**になる
-- **ブランチ側セッション**：修正してコミットし、GitHub PRを作成してmerge、pushまで自分の判断で確認なしに進めてよい。理由：
-  - `main`は別worktree（リポジトリ直下）にcheckout中のため、ローカルの`git merge`では取り込めない → GitHub PR経由でmergeする
-  - PRのmergeはgitが差分を見て安全に取り込む操作で、他セッションが既にmainに反映した変更を上書きで消すことがない（flashcards等の`firebase deploy`のような無条件上書きとは性質が違う）
-  - mainブランチは保護設定なし、個人用の低リスクなツールであるため
-- **mainセッション**：自分の変更はコミット→pushまで自由に進めてよい（確認不要）
-  - 作業前の`git pull`は`.claude/hooks/git-sync.sh`（SessionStartフック）が自動実行するので手で叩く必要はない。fast-forwardできる時だけpullし、分岐時・未コミット変更がある時はpullせず警告を出す
-  - 上流ブランチが無いブランチ（detached HEADのworktree含む）ではスキップされる
-- ブランチ側セッションはUI変更を行ったら、Previewでスクリーンショットを撮り、画像として（テキスト説明だけでなく）必ずチャットに添付する
+- GitHub Pages が `main` ブランチを直接見て自動ビルド・公開する構成（`https://a3design-aminagata.github.io/merge-smith-calculator/`）。**main への push がそのままデプロイ**になる
+- 作業前の同期は `.claude/hooks/git-sync.sh`（SessionStart フック）が自動で行う。fast-forward できる時だけ pull し、分岐時・未コミット変更がある時は pull せず警告を出す
+- UI を変えたら Preview でスクリーンショットを撮り、画像としてチャットに添付する
 - `worker/`（Cloudflare Worker, gemini-proxy）はGitHub Pagesの対象外。Cloudflare側にGit連携は無いが、`.github/workflows/deploy-worker.yml`（GitHub Actions）が`worker/**`の変更を含むmainへのpushを検知して`wrangler deploy`を実行する。**手動デプロイは不要**
   - 必要なGitHub Secrets: `CLOUDFLARE_API_TOKEN`（Edit Cloudflare Workers権限）、`CLOUDFLARE_ACCOUNT_ID`
   - `GEMINI_API_KEY`はCloudflare側のSecretとして保持されており、`wrangler deploy`では消えない。ワークフローでは触らない
   - 手動で再デプロイしたい時はGitHubのActionsタブから`Deploy Cloudflare Worker`を`workflow_dispatch`で実行する（iPhoneのGitHubアプリからも可能）
 
-## クラウドセッション（iPhone / claude.ai/code）は main に push する
+## ブランチ運用（PC・iPhone のどのセッションも共通）
 
-- **`claude/...` などのブランチで始まっても、作業前に `git checkout main && git pull --ff-only origin main` して main で作業し、main へ push する**（2026-09-25 ユーザー指定）。ブランチへの push だけでは本番に出ず、ユーザーが後で merge する手間になる
-- push が non-fast-forward で拒否されたら `git pull --rebase origin main` してから push し直す。force push はしない
-- 下の「ブランチ側セッションが PR を作って merge」はPCでworktreeを並行させる時の話。クラウドセッションは PR を作らず main で直接作業してよい
+2026-09-25 ユーザー指定。**main に直接コミットしない。毎回ブランチで作業し、確認が通ったらユーザーに聞かずに自分で main へ入れて push する。** main への push で GitHub Pages が公開され、`worker/` を触った時は GitHub Actions が Cloudflare Worker をデプロイする。
+
+1. 開始時に `git fetch origin` で最新の main を取る
+2. 作業ブランチを切る: `git switch -c <内容が分かる名前> origin/main`
+   - クラウドセッション（iPhone / claude.ai/code）で最初から付いている `claude/...` ブランチ、PC でアプリが作った worktree のブランチは、そのまま使ってよい
+   - **PC の本体フォルダ（`~/apps/merge-smith-calculator`）は main のまま置いておき、そこでブランチを切り替えない**（他のセッションが同じフォルダを使っているため）。PC で本体フォルダから始まったセッションは `git worktree add .claude/worktrees/<名前> -b <名前> origin/main` で worktree を作ってそこで作業する
+3. 修正して「merge 前の確認」を通す: 画面を触った時は Preview / ローカルで開いてコンソールエラーが無く、変えた所が意図どおり表示されること
+4. 最新の main を取り込む: `git fetch origin && git merge origin/main`
+5. conflict は自分で解消する（両方の意図を残す。どちらを取るか判断できない時だけユーザーに聞く）。解消したら 3 の確認をもう一度
+6. main へ入れる: `git push origin HEAD:main`（4 で取り込み済みなので fast-forward で入る）。**拒否されたら（他のセッションが先に入れた）4 からやり直す**
+7. PC では本体フォルダの main も進めておく: `git -C ~/apps/merge-smith-calculator merge --ff-only origin/main`（本体フォルダに未コミットの変更がある時は触らない。次のセッション開始時に同期フックが追いつかせる）
+8. **force push 禁止。** 入れ終わったらブランチを消す（ローカル・リモート・worktree。クラウドからはリモートを消せないのでローカルだけ）
+- **例外: ユーザーが「見てから決めたい」「どっちか選びたい」と言った変更**は 6 の前で止め、スクリーンショット等を見せて OK をもらってから入れる
+- GitHub の PR は作らない（Actions の分数を使い、手間が増えるだけ）
+- 下の「ブランチ側セッションが PR を作って merge」は廃止。この節が優先する
 
 # キャッシュ対策（スマホで古い版が出る問題）
 
