@@ -14,6 +14,12 @@
   - `GEMINI_API_KEY`はCloudflare側のSecretとして保持されており、`wrangler deploy`では消えない。ワークフローでは触らない
   - 手動で再デプロイしたい時はGitHubのActionsタブから`Deploy Cloudflare Worker`を`workflow_dispatch`で実行する（iPhoneのGitHubアプリからも可能）
 
+## クラウドセッション（iPhone / claude.ai/code）は main に push する
+
+- **`claude/...` などのブランチで始まっても、作業前に `git checkout main && git pull --ff-only origin main` して main で作業し、main へ push する**（2026-09-25 ユーザー指定）。ブランチへの push だけでは本番に出ず、ユーザーが後で merge する手間になる
+- push が non-fast-forward で拒否されたら `git pull --rebase origin main` してから push し直す。force push はしない
+- 下の「ブランチ側セッションが PR を作って merge」はPCでworktreeを並行させる時の話。クラウドセッションは PR を作らず main で直接作業してよい
+
 # キャッシュ対策（スマホで古い版が出る問題）
 
 - `scripts/stamp-assets.py` がHTML内のCSS/JS参照に `?v=<内容ハッシュ>` を付け直す。`.githooks/pre-commit` から自動実行されるので、手で叩く必要はない（`?v=`を手編集もしない）
